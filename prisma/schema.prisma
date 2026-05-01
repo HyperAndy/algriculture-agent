@@ -1,0 +1,98 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Field {
+  id                 String             @id
+  name               String
+  location           String
+  areaMu             Float
+  cropType           String
+  variety            String?
+  growthStage        String
+  sowingDate         DateTime
+  targetYieldKgPerMu Float?
+  riskLevel          String             @default("low")
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+  observations       FieldObservation[]
+  agentRuns          AgentRun[]
+  tasks              FarmingTask[]
+}
+
+model FieldObservation {
+  id                   String     @id @default(cuid())
+  fieldId              String
+  field                Field      @relation(fields: [fieldId], references: [id], onDelete: Cascade)
+  temperatureC         Float
+  rainfallMm           Float
+  windLevel            String?
+  weatherTrend         String
+  soilMoisturePercent  Float
+  soilTemperatureC     Float?
+  soilPh               Float?
+  nitrogenLevel        String
+  phosphorusLevel      String
+  potassiumLevel       String
+  plantHeightCm        Float?
+  leafColor            String
+  growthStatus         String
+  pestDescription      String?
+  diseaseDescription   String?
+  weedDescription      String?
+  lastIrrigationDate   DateTime?
+  lastFertilizationDate DateTime?
+  lastPesticideDate    DateTime?
+  notes                String?
+  createdAt            DateTime   @default(now())
+  agentRuns            AgentRun[]
+}
+
+model AgentRun {
+  id               String             @id @default(cuid())
+  fieldId          String
+  field            Field              @relation(fields: [fieldId], references: [id], onDelete: Cascade)
+  observationId    String
+  observation      FieldObservation   @relation(fields: [observationId], references: [id], onDelete: Cascade)
+  status           String             @default("completed")
+  overallRiskLevel String
+  summary          String
+  reasoning        String
+  recommendations  String
+  createdAt        DateTime           @default(now())
+  completedAt      DateTime?
+  steps            AgentStep[]
+  tasks            FarmingTask[]
+}
+
+model AgentStep {
+  id            String    @id @default(cuid())
+  agentRunId    String
+  agentRun      AgentRun  @relation(fields: [agentRunId], references: [id], onDelete: Cascade)
+  agentName     String
+  status        String    @default("completed")
+  inputSummary  String
+  outputSummary String
+  startedAt     DateTime  @default(now())
+  completedAt   DateTime?
+}
+
+model FarmingTask {
+  id          String    @id @default(cuid())
+  fieldId     String
+  field       Field     @relation(fields: [fieldId], references: [id], onDelete: Cascade)
+  agentRunId  String
+  agentRun    AgentRun  @relation(fields: [agentRunId], references: [id], onDelete: Cascade)
+  title       String
+  description String
+  priority    String
+  dueDate     DateTime
+  status      String    @default("pending")
+  createdAt   DateTime  @default(now())
+  completedAt DateTime?
+}

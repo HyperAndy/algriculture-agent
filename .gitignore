@@ -4,3 +4,4 @@ prisma/dev.db
 *.log
 .env.local
 .env
+docs/

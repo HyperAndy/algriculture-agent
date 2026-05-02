@@ -27,14 +27,18 @@ export function RiskAreaChart({ data }: { data: RiskAreaData[] }) {
       },
       legend: {
         bottom: 0,
+        left: "center",
+        itemGap: 24,
+        itemWidth: 12,
+        itemHeight: 12,
         data: ["高风险", "中风险", "低风险"],
-        textStyle: { color: "#666", fontSize: 12 },
+        textStyle: { color: "#6b7280", fontSize: 12, padding: [0, 0, 0, 4] },
       },
       grid: {
         left: 8,
-        right: 8,
+        right: 16,
         top: 8,
-        bottom: 32,
+        bottom: 40,
       },
       xAxis: {
         type: "category",

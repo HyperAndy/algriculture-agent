@@ -30,19 +30,31 @@ export function CropDonutChart({ data }: { data: CropDonutData[] }) {
       },
       legend: {
         bottom: 0,
-        itemWidth: 8,
-        itemHeight: 8,
-        textStyle: { color: "#666", fontSize: 12 },
+        itemGap: 16,
+        itemWidth: 10,
+        itemHeight: 10,
+        itemBorderRadius: 2,
+        textStyle: { color: "#6b7280", fontSize: 12, padding: [0, 0, 0, 4] },
       },
       series: [
         {
           type: "pie",
-          radius: ["50%", "75%"],
-          center: ["50%", "45%"],
+          radius: ["52%", "78%"],
+          center: ["50%", "44%"],
           avoidLabelOverlap: false,
+          padAngle: 2,
+          itemStyle: {
+            borderColor: "#fff",
+            borderWidth: 3,
+            borderRadius: 4,
+          },
           label: { show: false },
           emphasis: {
-            scaleSize: 6,
+            scaleSize: 8,
+            itemStyle: {
+              shadowBlur: 12,
+              shadowColor: "rgba(0,0,0,0.15)",
+            },
           },
           data: data.map((d) => ({
             name: d.label,
@@ -51,18 +63,31 @@ export function CropDonutChart({ data }: { data: CropDonutData[] }) {
           })),
         },
       ],
-      graphic: {
-        type: "text",
-        left: "center",
-        top: "38%",
-        style: {
-          text: `${totalArea}亩`,
-          textAlign: "center",
-          fill: "#333",
-          fontSize: 16,
-          fontWeight: "bold",
+      graphic: [
+        {
+          type: "text",
+          left: "center",
+          top: "34%",
+          style: {
+            text: "总面积",
+            textAlign: "center",
+            fill: "#9ca3af",
+            fontSize: 12,
+          },
         },
-      },
+        {
+          type: "text",
+          left: "center",
+          top: "42%",
+          style: {
+            text: `${totalArea}亩`,
+            textAlign: "center",
+            fill: "#111827",
+            fontSize: 18,
+            fontWeight: "bold",
+          },
+        },
+      ],
     })
 
     const handleResize = () => instance.resize()

@@ -9,17 +9,11 @@ import { EmptyState } from "@/components/console/empty-state"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card"
 
-const CROP_COLORS: Record<string, string> = {
-  小麦: "#eab308",
-  玉米: "#22c55e",
-  水稻: "#3b82f6",
-  大豆: "#a855f7",
-  棉花: "#f97316",
-  油菜: "#06b6d4",
-  蔬菜: "#8b5cf6",
-  马铃薯: "#ec4899",
-  花生: "#d97706",
-  高粱: "#14b8a6",
+const CROP_CONFIG: Record<string, { label: string; color: string }> = {
+  rice: { label: "水稻", color: "#3b82f6" },
+  wheat: { label: "小麦", color: "#f59e0b" },
+  corn: { label: "玉米", color: "#22c55e" },
+  soybean: { label: "大豆", color: "#a855f7" },
 }
 
 function generateRiskTrend(highRisk: number, mediumRisk: number, lowRisk: number) {
@@ -48,12 +42,15 @@ function buildCropDonutData(
   for (const f of fields) {
     map.set(f.cropType, (map.get(f.cropType) ?? 0) + f.areaMu)
   }
-  return Array.from(map.entries()).map(([crop, area]) => ({
-    crop,
-    label: crop,
-    area: Math.round(area * 100) / 100,
-    color: CROP_COLORS[crop] ?? "#6b7280",
-  }))
+  return Array.from(map.entries()).map(([crop, area]) => {
+    const cfg = CROP_CONFIG[crop] ?? { label: crop, color: "#6b7280" }
+    return {
+      crop,
+      label: cfg.label,
+      area: Math.round(area * 100) / 100,
+      color: cfg.color,
+    }
+  })
 }
 
 function PriorityBadge({ priority }: { priority: string }) {

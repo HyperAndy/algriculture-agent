@@ -68,7 +68,11 @@ export default async function DemoPage() {
             outputSummary: step.outputSummary
           }))
         }
-      : null
+      : null,
+    source: {
+      mode: "real",
+      fallbackReasons: []
+    }
   };
 
   return <CommandCenter data={data} />;

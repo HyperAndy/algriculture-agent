@@ -4,6 +4,16 @@ import type { CommandCenterData } from "@/components/command-center/types";
 
 export const dynamic = "force-dynamic";
 
+function formatTime(d: Date) {
+  const y = d.getFullYear();
+  const mo = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  const h = String(d.getHours()).padStart(2, "0");
+  const mi = String(d.getMinutes()).padStart(2, "0");
+  const s = String(d.getSeconds()).padStart(2, "0");
+  return `${y}-${mo}-${day} ${h}:${mi}:${s}`;
+}
+
 export default async function DemoPage() {
   const [fields, tasks, latestRun] = await Promise.all([
     prisma.field.findMany({ orderBy: { createdAt: "asc" } }),
@@ -20,6 +30,7 @@ export default async function DemoPage() {
 
   const data: CommandCenterData = {
     generatedAt: new Date().toISOString(),
+    formattedTime: formatTime(new Date()),
     fields: fields.map((field) => ({
       id: field.id,
       name: field.name,

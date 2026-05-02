@@ -90,12 +90,12 @@ function normalizeFields(fields: CommandField[]) {
 }
 
 function formatDate(value: string) {
-  return new Intl.DateTimeFormat("zh-CN", {
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit"
-  }).format(new Date(value));
+  const d = new Date(value);
+  const mo = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  const h = String(d.getHours()).padStart(2, "0");
+  const mi = String(d.getMinutes()).padStart(2, "0");
+  return `${mo}-${day} ${h}:${mi}`;
 }
 
 function priorityLabel(priority: string) {
@@ -131,7 +131,7 @@ export function CommandCenter({ data }: { data: CommandCenterData }) {
   return (
     <main className="sci-screen">
       <div className="sci-board">
-        <TopBar initialNow={data.generatedAt} />
+        <TopBar initialNow={data.generatedAt} formattedTime={data.formattedTime} />
 
         <section className="sci-panel sci-situation">
           <PanelTitle icon={<Tractor size={18} />} title="综合态势" />
@@ -187,23 +187,22 @@ export function CommandCenter({ data }: { data: CommandCenterData }) {
   );
 }
 
-function TopBar({ initialNow }: { initialNow: string }) {
-  const [now, setNow] = useState(() => new Date(initialNow));
+function TopBar({ initialNow, formattedTime }: { initialNow: string; formattedTime: string }) {
+  const [timeText, setTimeText] = useState(formattedTime);
 
   useEffect(() => {
-    const timer = window.setInterval(() => setNow(new Date()), 1000);
+    const timer = window.setInterval(() => {
+      const d = new Date();
+      const y = d.getFullYear();
+      const mo = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      const h = String(d.getHours()).padStart(2, "0");
+      const mi = String(d.getMinutes()).padStart(2, "0");
+      const s = String(d.getSeconds()).padStart(2, "0");
+      setTimeText(`${y}-${mo}-${day} ${h}:${mi}:${s}`);
+    }, 1000);
     return () => window.clearInterval(timer);
   }, []);
-
-  const timeText = new Intl.DateTimeFormat("zh-CN", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: false
-  }).format(now);
 
   return (
     <header className="sci-top">

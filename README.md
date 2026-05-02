@@ -8,30 +8,19 @@ Two interfaces built on the same data and agent capabilities:
 
 | Entry | Description |
 |-------|-------------|
-| `/demo` — Dashboard | A command center for presentations and reviews, providing macro-level overviews of field status, risk distribution, and agent activity |
-| `/console` — Admin | An operations interface for agricultural technicians, supporting field management, observation input, analysis reports, task scheduling, and historical archives |
+| `/demo` — Dashboard | A sci-fi command center for presentations and reviews, providing macro-level overviews of field status, risk distribution, and agent activity with ECharts visualizations |
+| `/console` — Admin | A modern admin panel for agricultural technicians, featuring shadcn/ui components, ⌘K global search, task kanban, PDF report export, and light/dark mode |
 
 ## Core Capabilities
 
-- **Field Management** — Create and edit field plots, register crop types, varieties, growth stages, target yields, and other basic information
-- **Observation Input** — Field metrics collection: temperature, rainfall, soil parameters (moisture/temperature/pH/NPK), plant status, pest/disease/weed descriptions
-- **Multi-Agent Analysis** — Six specialized agents run sequentially in a pipeline, covering sensing, diagnosis, pest/disease warning, water/fertilizer, disaster response, and archival
-- **Long-Chain Reasoning Reports** — Full traceability of agent execution, including input summaries, output conclusions, and risk signals for each step
-- **Farming Task Scheduling** — Automatically generate farming tasks based on analysis results, supporting priority sorting and status tracking
-- **Historical Archive** — All agent run records and reports are searchable and traceable
-
-## Six Specialized Agents
-
-| Agent | Responsibility |
-|-------|---------------|
-| Field Sensing Agent | Aggregates multi-source observation data (weather, soil, plant) to generate field status snapshots |
-| Crop Diagnosis Agent | Evaluates growth stage alignment with expectations, identifies nutrient deficiencies, excessive growth, and other anomalies |
-| Pest/Disease/Weed Alert Agent | Analyzes pest, disease, and weed descriptions, outputs risk levels and intervention window recommendations |
-| Water & Fertilizer Decision Agent | Combines crop requirements and soil parameters to recommend irrigation and fertilization amounts |
-| Disaster Response Agent | Identifies risks from temperature extremes, drought, waterlogging, and generates emergency response plans |
-| Farming Archive Agent | Summarizes historical analyses and farming operations, outputting traceable decision archives |
-
-> During the MVP phase, agents use a mock rule engine for simulation. Reasoning logic is defined in `src/lib/agents/mock-agents.ts`, and the agent pipeline orchestration is in `src/lib/agents/orchestrator.ts`.
+- **Field Management** — Create and edit field plots, register crop types, varieties, growth stages, target yields; searchable grid with crop/risk/growth filters
+- **Observation Input** — Step-wizard form for field metrics: temperature, rainfall, soil parameters, plant status, pest/disease/weed descriptions; one-click demo data fill
+- **Multi-Agent Analysis** — Six specialized agents run sequentially in a pipeline with animated flow visualization, covering sensing, diagnosis, alerting, water/fertilizer, disaster response, and archival
+- **Long-Chain Reasoning Reports** — Structured, collapsible reasoning sections with full traceability and PDF export (`window.print()`)
+- **Farming Task Scheduling** — Kanban board and list views with status/priority filtering, directly generated from analysis results
+- **Historical Archive** — Searchable and paginated archive with risk/crop/date filters
+- **Global Search** — `Ctrl+K` command palette searching across fields, reports, and tasks
+- **Dark Mode** — Light default with system-aware dark mode toggle, persisted via localStorage
 
 ## Tech Stack
 
@@ -39,56 +28,60 @@ Two interfaces built on the same data and agent capabilities:
 |----------|------------|
 | Framework | Next.js 15 (App Router) |
 | UI Library | React 19 |
+| Component Library | shadcn/ui (new-york v4) |
 | Language | TypeScript 5.7 |
 | Styling | Tailwind CSS 4 |
+| Charts | ECharts 5 |
 | Icons | Lucide React |
 | ORM | Prisma 6 |
 | Database | SQLite (local file) |
+| Theme | next-themes |
+| Toast | sonner |
 | Testing | Vitest 2 |
-| Tooling | tsx, postcss, autoprefixer |
 
 ## Project Structure
 
 ```
 ├── prisma/
-│   ├── schema.prisma          # Data model definitions
-│   └── seed.ts                # Seed data
+│   ├── schema.prisma              # Data model definitions
+│   └── seed.ts                    # Seed data
 ├── scripts/
-│   └── init_sqlite.py         # SQLite database initialization script
+│   └── init_sqlite.py             # SQLite initialization script
 ├── src/
 │   ├── app/
-│   │   ├── api/               # RESTful API routes
-│   │   ├── console/           # Admin panel pages
-│   │   ├── demo/              # Dashboard
-│   │   └── page.tsx           # Landing page
+│   │   ├── api/                   # RESTful API routes (11 endpoints)
+│   │   ├── console/               # Admin panel (layout + 8 pages + loading states)
+│   │   │   ├── layout.tsx         # Sidebar + header + command palette shell
+│   │   │   ├── archive/           # Archive with search, filter, pagination
+│   │   │   ├── fields/            # Field list, detail (tabs), input (wizard), analysis (pipeline)
+│   │   │   ├── reports/           # Report detail with structured reasoning + PDF export
+│   │   │   └── tasks/             # Kanban board + list view with filters
+│   │   ├── demo/                  # Sci-fi command center dashboard
+│   │   └── page.tsx               # Landing page
 │   ├── components/
-│   │   ├── agent-timeline.tsx   # Agent execution timeline
-│   │   ├── analyze-button.tsx   # Trigger analysis button
-│   │   ├── app-shell.tsx        # Application shell
-│   │   ├── command-center/      # Command center dashboard components
-│   │   ├── field-card.tsx       # Field plot card
-│   │   ├── observation-form.tsx # Observation input form
-│   │   ├── report-panel.tsx     # Analysis report panel
-│   │   ├── risk-badge.tsx       # Risk level badge
-│   │   ├── stat-card.tsx        # Statistics card
-│   │   └── task-list.tsx        # Farming task list
+│   │   ├── ui/                    # shadcn/ui primitives (21 components)
+│   │   ├── console/               # Console-specific components (16 components)
+│   │   │   ├── app-sidebar.tsx    # Collapsible dark sidebar with localStorage persistence
+│   │   │   ├── command-palette.tsx   # ⌘K global search dialog
+│   │   │   ├── stat-card.tsx      # Animated count-up stat card
+│   │   │   ├── field-card.tsx     # Field card with growth progress bar
+│   │   │   ├── task-card.tsx      # Task card with priority/status
+│   │   │   ├── risk-area-chart.tsx   # ECharts risk trend area chart
+│   │   │   ├── crop-donut-chart.tsx  # ECharts crop distribution donut
+│   │   │   ├── risk-gauge-chart.tsx  # ECharts risk gauge
+│   │   │   ├── filter-bar.tsx     # Reusable filter bar
+│   │   │   └── ...
+│   │   └── command-center/        # Demo dashboard sci-fi components
 │   ├── lib/
-│   │   ├── agents/              # Agent core logic
-│   │   │   ├── analysis-service.ts   # Analysis service
-│   │   │   ├── mock-agents.ts        # Mock agent rules
-│   │   │   ├── orchestrator.ts       # Agent pipeline orchestration
-│   │   │   ├── task-generator.ts     # Task generator
-│   │   │   └── types.ts              # Type definitions
-│   │   ├── domain/
-│   │   │   ├── crops.ts         # Crop domain model
-│   │   │   └── risk.ts          # Risk level model
-│   │   ├── data-mappers.ts      # Data mappers
-│   │   └── db.ts                # Database client
-│   └── app/globals.css          # Global styles
-├── tests/                       # Unit tests
-├── vitest.config.ts
-├── package.json
-└── tsconfig.json
+│   │   ├── agents/                # Agent core logic
+│   │   ├── domain/                # Domain models (crops, risk)
+│   │   ├── db.ts                  # Prisma client
+│   │   └── utils.ts               # cn() utility
+│   ├── hooks/
+│   │   └── use-mobile.ts          # Mobile detection hook
+│   └── app/globals.css            # Theme variables + animations + print styles
+├── tests/                         # Unit tests
+└── components.json                # shadcn/ui configuration
 ```
 
 ## Local Development
@@ -96,7 +89,7 @@ Two interfaces built on the same data and agent capabilities:
 ### Prerequisites
 
 - Node.js >= 18
-- Python 3 (required for SQLite initialization script)
+- Python 3 (required for SQLite initialization)
 
 ### Setup & Launch
 
@@ -104,7 +97,7 @@ Two interfaces built on the same data and agent capabilities:
 # Install dependencies
 npm install
 
-# Initialize database (create tables + generate Prisma Client + seed data)
+# Initialize database
 npm run db:init
 
 # Start development server
@@ -114,19 +107,8 @@ npm run dev
 Access:
 
 - Home: `http://localhost:3000`
-- Dashboard: `http://localhost:3000/demo`
+- Demo Dashboard: `http://localhost:3000/demo`
 - Admin Panel: `http://localhost:3000/console`
-
-### Database Initialization Notes
-
-`npm run db:init` uses a Python script to directly write SQLite table structures, bypassing Prisma schema engine. Use this when the schema engine is incompatible with your environment.
-
-You may also use the standard Prisma workflow:
-
-```bash
-npm run db:push
-npm run db:seed
-```
 
 ## Available Scripts
 
@@ -148,14 +130,17 @@ npm run db:seed
 | GET/POST | `/api/fields` | List fields / Create field |
 | GET/PUT/DELETE | `/api/fields/[id]` | Field detail / Update / Delete |
 | POST | `/api/fields/[id]/observations` | Submit field observation |
+| GET | `/api/fields/[id]/observations` | List observation history |
 | POST | `/api/fields/[id]/analyze` | Trigger agent analysis |
 | GET | `/api/reports/[id]` | Get analysis report |
+| GET | `/api/reports/[id]/export` | Export report data for PDF |
 | GET | `/api/tasks` | Get farming task list |
+| PATCH | `/api/tasks/batch` | Batch update task status |
+| GET | `/api/search?q=` | Global search (fields, reports, tasks) |
+| GET | `/api/archive?q=&risk=&crop=&from=&to=&page=&limit=` | Archive search with pagination |
 
 ## Data Model
 
-Core entities: **Field** → **FieldObservation** → **AgentRun** → **AgentStep**
+Core entities: **Field** → **FieldObservation** → **AgentRun** → **AgentStep** → **FarmingTask**
 
-An analyses are linked to specific fields and observations via AgentRun. Each AgentRun contains multiple AgentSteps (corresponding to the six agents), and generates **FarmingTask** records.
-
-See `prisma/schema.prisma` for the full schema definition.
+Analyses are linked to specific fields and observations via AgentRun. Each AgentRun contains multiple AgentSteps (corresponding to the six agents), and generates FarmingTask records.

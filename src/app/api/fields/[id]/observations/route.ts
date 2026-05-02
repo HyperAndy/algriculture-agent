@@ -1,13 +1,29 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 
-export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  const observations = await prisma.fieldObservation.findMany({
-    where: { fieldId: id },
-    orderBy: { createdAt: "desc" }
-  });
-  return NextResponse.json({ observations });
+export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  try {
+    const { id } = await params;
+    const { searchParams } = new URL(request.url);
+    const cursor = searchParams.get("cursor");
+    const limit = Math.min(Math.max(Number(searchParams.get("limit")) || 50, 1), 100);
+
+    const observations = await prisma.fieldObservation.findMany({
+      where: { fieldId: id },
+      orderBy: { createdAt: "desc" },
+      take: limit + 1,
+      ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
+      include: { field: true }
+    });
+
+    const hasMore = observations.length > limit;
+    const data = observations.slice(0, limit);
+    const nextCursor = hasMore ? data[data.length - 1].id : null;
+
+    return NextResponse.json({ observations: data, nextCursor });
+  } catch {
+    return NextResponse.json({ error: "OBSERVATIONS_FAILED" }, { status: 500 });
+  }
 }
 
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {

@@ -1,17 +1,32 @@
-import { AppShell } from "@/components/app-shell";
-import { TaskList } from "@/components/task-list";
-import { prisma } from "@/lib/db";
+import { prisma } from "@/lib/db"
+import { TasksClient } from "./tasks-client"
 
 export default async function TasksPage() {
-  const tasks = await prisma.farmingTask.findMany({ orderBy: { dueDate: "asc" }, include: { field: true } });
-  return (
-    <AppShell>
-      <div className="mb-6">
-        <p className="text-sm font-bold text-[#1f6f49]">Tasks</p>
-        <h1 className="mt-2 text-3xl font-bold">农事任务</h1>
-        <p className="mt-2 text-[#637064]">跟踪Agent建议是否真正落到执行。</p>
-      </div>
-      <TaskList tasks={tasks} />
-    </AppShell>
-  );
+  const tasks = await prisma.farmingTask.findMany({
+    include: {
+      field: { select: { name: true } },
+    },
+  })
+
+  const priorityMap: Record<string, number> = { high: 3, medium: 2, low: 1 }
+
+  const sorted = [...tasks].sort((a, b) => {
+    const pa = priorityMap[a.priority] ?? 0
+    const pb = priorityMap[b.priority] ?? 0
+    if (pa !== pb) return pb - pa
+    return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()
+  })
+
+  const mappedTasks = sorted.map((t) => ({
+    id: t.id,
+    title: t.title,
+    description: t.description,
+    priority: t.priority,
+    status: t.status,
+    dueDate: t.dueDate.toISOString(),
+    completedAt: t.completedAt?.toISOString() ?? null,
+    fieldName: t.field.name,
+  }))
+
+  return <TasksClient tasks={mappedTasks} />
 }

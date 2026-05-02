@@ -1,68 +1,115 @@
-import Link from "next/link";
-import { AppShell } from "@/components/app-shell";
-import { ReportPanel } from "@/components/report-panel";
-import { RiskBadge } from "@/components/risk-badge";
-import { TaskList } from "@/components/task-list";
-import { parseRecommendations } from "@/lib/agents/analysis-service";
-import { getCropLabel, type CropType } from "@/lib/domain/crops";
-import { prisma } from "@/lib/db";
+import Link from "next/link"
+import { prisma } from "@/lib/db"
+import { FieldDetailClient } from "@/components/console/field-detail-client"
 
 export default async function FieldDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
+  const { id } = await params
+
   const field = await prisma.field.findUnique({
     where: { id },
     include: {
       observations: { orderBy: { createdAt: "desc" }, take: 1 },
-      agentRuns: { orderBy: { createdAt: "desc" }, take: 1, include: { steps: true, tasks: true } },
-      tasks: { orderBy: { dueDate: "asc" }, include: { field: true } }
-    }
-  });
-  if (!field) return <AppShell><div>地块不存在</div></AppShell>;
-  const latestRun = field.agentRuns[0];
-  return (
-    <AppShell>
-      <div className="mb-5 flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <p className="text-sm font-bold text-[#1f6f49]">Field Detail</p>
-          <h1 className="mt-2 text-3xl font-bold">{field.name}</h1>
-          <p className="mt-2 text-[#637064]">{field.location} · {getCropLabel(field.cropType as CropType)} · {field.growthStage} · {field.areaMu}亩</p>
-        </div>
-        <RiskBadge level={field.riskLevel} />
-      </div>
-      <div className="mb-6 flex flex-wrap gap-3">
-        <Link href={`/console/fields/${field.id}/input`} className="rounded-md bg-[#1f6f49] px-4 py-2 font-semibold text-white">录入观测</Link>
-        <Link href={`/console/fields/${field.id}/analysis`} className="rounded-md border border-[#b9c8b4] px-4 py-2 font-semibold">Agent分析</Link>
-      </div>
-      <div className="grid gap-6 xl:grid-cols-[1fr_0.8fr]">
-        <section className="rounded-lg border border-[#dce5d8] bg-white p-5">
-          <h2 className="text-xl font-bold">最新观测</h2>
-          {field.observations[0] ? (
-            <div className="mt-4 grid gap-3 md:grid-cols-3">
-              <Metric label="温度" value={`${field.observations[0].temperatureC}℃`} />
-              <Metric label="墒情" value={`${field.observations[0].soilMoisturePercent}%`} />
-              <Metric label="天气趋势" value={field.observations[0].weatherTrend} />
-            </div>
-          ) : <p className="mt-3 text-[#637064]">暂无观测数据，请先录入。</p>}
-        </section>
-        <section>
-          <h2 className="mb-3 text-xl font-bold">关联任务</h2>
-          <TaskList tasks={field.tasks} />
-        </section>
-      </div>
-      {latestRun ? (
-        <div className="mt-6">
-          <ReportPanel report={latestRun} recommendations={parseRecommendations(latestRun.recommendations)} />
-        </div>
-      ) : null}
-    </AppShell>
-  );
-}
+      agentRuns: {
+        orderBy: { createdAt: "desc" },
+        take: 1,
+        include: { steps: true },
+      },
+      tasks: { orderBy: [{ priority: "asc" }, { dueDate: "asc" }] },
+    },
+  })
 
-function Metric({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-lg bg-[#f6f8f3] p-4">
-      <p className="text-sm text-[#637064]">{label}</p>
-      <p className="mt-1 font-semibold">{value}</p>
-    </div>
-  );
+  const observationHistory = await prisma.fieldObservation.findMany({
+    where: { fieldId: id },
+    orderBy: { createdAt: "desc" },
+    take: 7,
+  })
+
+  if (!field) {
+    return (
+      <div className="space-y-4 py-12 text-center">
+        <h1 className="text-2xl font-bold">地块不存在</h1>
+        <p className="text-muted-foreground">
+          未找到该地块，或已被删除。
+        </p>
+        <Link
+          href="/console/fields"
+          className="inline-block text-sm text-primary underline underline-offset-4 hover:no-underline"
+        >
+          返回地块列表
+        </Link>
+      </div>
+    )
+  }
+
+  const serializeObs = (o: (typeof field.observations)[number]) =>
+    o == null
+      ? null
+      : {
+          id: o.id,
+          temperatureC: o.temperatureC,
+          rainfallMm: o.rainfallMm,
+          soilMoisturePercent: o.soilMoisturePercent,
+          soilPh: o.soilPh,
+          plantHeightCm: o.plantHeightCm,
+          leafColor: o.leafColor,
+          growthStatus: o.growthStatus,
+          weatherTrend: o.weatherTrend,
+          createdAt: o.createdAt.toISOString(),
+        }
+
+  const run = field.agentRuns[0]
+
+  const serialized = {
+    id: field.id,
+    name: field.name,
+    location: field.location,
+    areaMu: field.areaMu,
+    cropType: field.cropType,
+    variety: field.variety,
+    growthStage: field.growthStage,
+    riskLevel: field.riskLevel,
+    createdAt: field.createdAt.toISOString(),
+    latestObservation: serializeObs(field.observations[0]),
+    latestAgentRun: run
+      ? {
+          id: run.id,
+          status: run.status,
+          overallRiskLevel: run.overallRiskLevel,
+          summary: run.summary,
+          reasoning: run.reasoning,
+          recommendations: run.recommendations,
+          createdAt: run.createdAt.toISOString(),
+          steps: run.steps.map((s) => ({
+            id: s.id,
+            agentName: s.agentName,
+            status: s.status,
+            inputSummary: s.inputSummary,
+            outputSummary: s.outputSummary,
+          })),
+        }
+      : null,
+    tasks: field.tasks.map((t) => ({
+      id: t.id,
+      title: t.title,
+      description: t.description,
+      priority: t.priority,
+      status: t.status,
+      dueDate: t.dueDate.toISOString(),
+      completedAt: t.completedAt?.toISOString() ?? null,
+    })),
+    observationHistory: observationHistory.map((o) => ({
+      id: o.id,
+      temperatureC: o.temperatureC,
+      rainfallMm: o.rainfallMm,
+      soilMoisturePercent: o.soilMoisturePercent,
+      soilPh: o.soilPh,
+      plantHeightCm: o.plantHeightCm,
+      leafColor: o.leafColor,
+      growthStatus: o.growthStatus,
+      weatherTrend: o.weatherTrend,
+      createdAt: o.createdAt.toISOString(),
+    })),
+  }
+
+  return <FieldDetailClient field={serialized} />
 }

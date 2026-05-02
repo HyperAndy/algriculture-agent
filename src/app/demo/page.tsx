@@ -2,6 +2,8 @@ import { prisma } from "@/lib/db";
 import { CommandCenter } from "@/components/command-center/command-center";
 import type { CommandCenterData } from "@/components/command-center/types";
 
+export const dynamic = "force-dynamic";
+
 export default async function DemoPage() {
   const [fields, tasks, latestRun] = await Promise.all([
     prisma.field.findMany({ orderBy: { createdAt: "asc" } }),
@@ -17,6 +19,7 @@ export default async function DemoPage() {
   ]);
 
   const data: CommandCenterData = {
+    generatedAt: new Date().toISOString(),
     fields: fields.map((field) => ({
       id: field.id,
       name: field.name,

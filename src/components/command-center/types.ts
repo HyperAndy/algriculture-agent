@@ -42,6 +42,7 @@ export interface CommandLatestRun {
 }
 
 export interface CommandCenterData {
+  generatedAt: string;
   fields: CommandField[];
   tasks: CommandTask[];
   latestRun: CommandLatestRun | null;

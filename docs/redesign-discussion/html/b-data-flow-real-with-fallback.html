@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>大屏真实数据 + Fallback 演示数据</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: #d8f3e8;
+      background:
+        linear-gradient(90deg, rgba(126,231,135,.045) 1px, transparent 1px),
+        linear-gradient(rgba(126,231,135,.035) 1px, transparent 1px),
+        radial-gradient(circle at 50% 10%, rgba(51,214,255,.16), transparent 30%),
+        linear-gradient(135deg, #041114, #071c22 50%, #031014);
+      background-size: 44px 44px, 44px 44px, auto, auto;
+      font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+    }
+    main { max-width: 1440px; margin: 0 auto; padding: 32px; }
+    h1 { margin: 0 0 8px; color: #fff; font-size: 34px; }
+    .sub { margin: 0 0 24px; color: #91b8b0; }
+    .flow {
+      display: grid;
+      grid-template-columns: 1fr 42px 1fr 42px 1fr;
+      gap: 12px;
+      align-items: stretch;
+    }
+    .card {
+      border: 1px solid rgba(110,255,194,.28);
+      border-radius: 8px;
+      background: linear-gradient(180deg, rgba(8,40,48,.88), rgba(3,18,24,.9));
+      box-shadow: inset 0 0 28px rgba(45,211,191,.08), 0 18px 44px rgba(0,0,0,.24);
+      padding: 18px;
+    }
+    .arrow { display: grid; place-items: center; color: #8ee48b; font-size: 30px; }
+    h2 { margin: 0 0 12px; color: #a5f7a4; font-size: 20px; }
+    p { margin: 0; color: #c6ded8; line-height: 1.65; font-size: 14px; }
+    ul { margin: 12px 0 0; padding-left: 18px; color: #c6ded8; line-height: 1.75; font-size: 14px; }
+    .decision {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+    .rule { min-height: 160px; border-color: rgba(51,214,255,.24); }
+    .rule strong { display: block; margin-bottom: 8px; color: #f5c84c; font-size: 16px; }
+    .warn strong { color: #ff776b; }
+    .ok strong { color: #9bf69e; }
+    .schema {
+      margin-top: 18px;
+      border: 1px solid rgba(110,255,194,.22);
+      border-radius: 8px;
+      overflow: hidden;
+      background: rgba(3,18,24,.7);
+    }
+    .schema div { display: grid; grid-template-columns: 220px 1fr; }
+    .schema span { padding: 12px 14px; border-bottom: 1px solid rgba(110,255,194,.12); color: #bdd8d1; font-size: 14px; }
+    .schema div:first-child span { color: #fff; background: rgba(51,214,255,.1); font-weight: 800; }
+    .schema div:last-child span { border-bottom: 0; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>/demo 数据边界：真实后台数据优先，Fallback 演示数据兜底</h1>
+  <p class="sub">大屏不是独立假页面，而是读取业务系统聚合数据；当真实数据不足以支撑完整大屏时，由稳定演示数据补齐视觉和故事线。</p>
+
+  <section class="flow">
+    <article class="card">
+      <h2>后台真实数据</h2>
+      <p>来自 `/console` 的地块、观测、AgentRun、任务、报告。用于体现系统真实可用性。</p>
+      <ul>
+        <li>fields</li>
+        <li>observations</li>
+        <li>agent-runs / steps</li>
+        <li>farming tasks</li>
+        <li>reports / archive</li>
+      </ul>
+    </article>
+    <div class="arrow">→</div>
+    <article class="card">
+      <h2>Dashboard ViewModel Builder</h2>
+      <p>统一把业务数据转换成大屏需要的稳定结构。这里处理空数据、缺字段、图表聚合、排序和风险摘要。</p>
+      <ul>
+        <li>buildCommandDashboardViewModel()</li>
+        <li>mergeDemoFallback()</li>
+        <li>validateDashboardReadiness()</li>
+      </ul>
+    </article>
+    <div class="arrow">→</div>
+    <article class="card">
+      <h2>/demo Big Screen</h2>
+      <p>只消费 ViewModel，不直接访问 Prisma，不直接拼接业务规则。这样视觉组件保持纯展示。</p>
+      <ul>
+        <li>稳定视觉结构</li>
+        <li>真实数据标识</li>
+        <li>演示兜底标识</li>
+      </ul>
+    </article>
+  </section>
+
+  <section class="decision">
+    <article class="card rule ok">
+      <strong>规则 1：真实数据完整</strong>
+      <p>使用真实后台聚合数据；大屏角落可显示“实时业务数据”。适合内部试用和产品演示。</p>
+    </article>
+    <article class="card rule">
+      <strong>规则 2：真实数据部分缺失</strong>
+      <p>真实数据优先，缺失图表或模块用演示数据补齐；模块级标记来源，保证大屏不空。</p>
+    </article>
+    <article class="card rule warn">
+      <strong>规则 3：真实数据异常</strong>
+      <p>回退到完整演示 ViewModel，同时保留错误日志。路演时页面不能崩，也不能出现半屏空白。</p>
+    </article>
+  </section>
+
+  <section class="schema">
+    <div><span>设计边界</span><span>说明</span></div>
+    <div><span>大屏组件</span><span>纯展示组件，只接收 `CommandDashboardViewModel`。</span></div>
+    <div><span>数据聚合</span><span>放在 `features/dashboard/server`，负责查询真实数据和 fallback 合并。</span></div>
+    <div><span>演示数据</span><span>放在 `features/dashboard/demo-data`，作为确定性 seed，不散落在组件里。</span></div>
+    <div><span>测试重点</span><span>覆盖三种场景：真实完整、真实缺失、真实异常回退。</span></div>
+  </section>
+</main>
+</body>
+</html>

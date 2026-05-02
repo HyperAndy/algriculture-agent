@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>B 方案模块架构</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: #d8f3e8;
+      background:
+        linear-gradient(90deg, rgba(126,231,135,.045) 1px, transparent 1px),
+        linear-gradient(rgba(126,231,135,.035) 1px, transparent 1px),
+        radial-gradient(circle at 48% 10%, rgba(51,214,255,.16), transparent 30%),
+        linear-gradient(135deg, #041114, #071c22 48%, #031014);
+      background-size: 44px 44px, 44px 44px, auto, auto;
+      font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+    }
+    main { max-width: 1460px; margin: 0 auto; padding: 32px; }
+    h1 { margin: 0 0 8px; color: #fff; font-size: 34px; }
+    .sub { margin: 0 0 24px; color: #91b8b0; }
+    .stack { display: grid; gap: 14px; }
+    .layer {
+      border: 1px solid rgba(110,255,194,.28);
+      border-radius: 8px;
+      background: linear-gradient(180deg, rgba(8,40,48,.86), rgba(3,18,24,.88));
+      box-shadow: inset 0 0 28px rgba(45,211,191,.08), 0 18px 44px rgba(0,0,0,.22);
+      padding: 16px;
+    }
+    .layer h2 { margin: 0 0 12px; color: #a5f7a4; font-size: 19px; }
+    .cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .cols.two { grid-template-columns: repeat(2, 1fr); }
+    .box {
+      min-height: 104px;
+      border: 1px solid rgba(51,214,255,.2);
+      border-radius: 7px;
+      padding: 14px;
+      background: rgba(4, 22, 28, .72);
+    }
+    .box strong { display: block; margin-bottom: 8px; color: #f5c84c; font-size: 16px; }
+    .box p { margin: 0; color: #bdd8d1; font-size: 13px; line-height: 1.65; }
+    .shared strong { color: #9bf69e; }
+    .warn strong { color: #ff776b; }
+    .flow {
+      display: grid;
+      grid-template-columns: 1fr 38px 1fr 38px 1fr;
+      align-items: center;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .arrow { text-align: center; color: #8ee48b; font-size: 28px; }
+    .note {
+      margin-top: 16px;
+      padding: 14px 16px;
+      border-left: 3px solid #f5c84c;
+      background: rgba(245,200,76,.08);
+      color: #d8f3e8;
+    }
+  </style>
+</head>
+<body>
+<main>
+  <h1>B 方案：模块化单体 + 双前端体验</h1>
+  <p class="sub">核心原则：业务内核共享，前端体验隔离。大屏是“演示驾驶舱”，后台是“业务工作台”，两者不再混用样式和组件。</p>
+
+  <section class="stack">
+    <div class="layer">
+      <h2>1. Frontend Experience Layer</h2>
+      <div class="cols">
+        <div class="box"><strong>Big Screen App</strong><p>`/demo`，科幻农业指挥中心。使用独立设计令牌、独立大屏组件、独立动效系统。</p></div>
+        <div class="box"><strong>Console App</strong><p>`/console`，企业级农业 SaaS 管理后台。强调表单、列表、详情、任务流和报告可读性。</p></div>
+        <div class="box shared"><strong>Shared UI Primitives</strong><p>按钮、Badge、Tooltip、Dialog、Table 等基础组件可共享，但主题变量分开。</p></div>
+      </div>
+    </div>
+
+    <div class="layer">
+      <h2>2. Feature Modules</h2>
+      <div class="cols">
+        <div class="box"><strong>fields</strong><p>地块、作物、品种、面积、生育期、风险级别。</p></div>
+        <div class="box"><strong>observations</strong><p>天气、土壤、苗情、病虫草害、农事记录录入。</p></div>
+        <div class="box"><strong>agent-runs</strong><p>Agent 编排、步骤记录、推理摘要、建议生成。</p></div>
+        <div class="box"><strong>tasks</strong><p>农事任务生成、状态流转、优先级、到期提醒。</p></div>
+        <div class="box"><strong>reports</strong><p>诊断报告、归档、导出、可追溯结果。</p></div>
+        <div class="box"><strong>dashboard</strong><p>给 `/demo` 和 `/console` 提供不同 ViewModel，而不是组件里拼数据。</p></div>
+      </div>
+    </div>
+
+    <div class="layer">
+      <h2>3. Application / Domain / Infrastructure</h2>
+      <div class="flow">
+        <div class="box shared"><strong>Application Services</strong><p>面向用例：创建观测、运行分析、生成任务、获取驾驶舱数据。</p></div>
+        <div class="arrow">→</div>
+        <div class="box shared"><strong>Domain Core</strong><p>风险规则、作物阶段、Agent 输出契约、任务生成规则。</p></div>
+        <div class="arrow">→</div>
+        <div class="box"><strong>Infrastructure</strong><p>Prisma Repository、SQLite/Postgres、Mock/LLM Agent Provider、外部数据适配器。</p></div>
+      </div>
+      <div class="note">重构重点：把现在散落在页面、API route、组件里的业务判断，收敛到 `features/*` 和 `domain/*`。</div>
+    </div>
+  </section>
+</main>
+</body>
+</html>

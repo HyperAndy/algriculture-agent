@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>移动端完整可操作方案</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: #18241f;
+      background: #f5f7f4;
+      font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+    }
+    main { max-width: 1500px; margin: 0 auto; padding: 32px; }
+    h1 { margin: 0 0 8px; color: #10251a; font-size: 34px; }
+    .sub { margin: 0 0 24px; color: #64756c; }
+    .layout { display: grid; grid-template-columns: 360px 1fr; gap: 22px; align-items: start; }
+    .phone {
+      width: 340px;
+      min-height: 700px;
+      border: 10px solid #14251c;
+      border-radius: 34px;
+      background: #f7faf6;
+      overflow: hidden;
+      box-shadow: 0 22px 60px rgba(16, 37, 26, .22);
+    }
+    .phone-head {
+      height: 72px;
+      padding: 18px 18px 10px;
+      color: #fff;
+      background: #123b2b;
+    }
+    .phone-head strong { display: block; font-size: 18px; }
+    .phone-head span { color: #cfe7d8; font-size: 12px; }
+    .phone-body { padding: 14px; display: grid; gap: 12px; }
+    .metric-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .metric, .card {
+      border: 1px solid #dfe7dd;
+      border-radius: 12px;
+      background: #fff;
+      box-shadow: 0 8px 24px rgba(31, 79, 52, .06);
+    }
+    .metric { padding: 12px; min-height: 76px; font-size: 12px; color: #64756c; }
+    .metric b { display: block; margin-top: 8px; color: #1f6f49; font-size: 22px; }
+    .card { padding: 14px; }
+    .card h3 { margin: 0 0 10px; color: #10251a; font-size: 15px; }
+    .line { height: 26px; border-bottom: 1px solid #edf2ec; }
+    .primary { display: block; margin-top: 12px; padding: 10px 12px; border-radius: 9px; color: #fff; background: #1f6f49; text-align: center; font-weight: 800; font-size: 14px; }
+    .bottom-nav {
+      position: sticky;
+      bottom: 0;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      margin-top: 10px;
+      background: #dfe7dd;
+    }
+    .bottom-nav span {
+      padding: 10px 4px;
+      background: #fff;
+      text-align: center;
+      color: #64756c;
+      font-size: 12px;
+    }
+    .bottom-nav span.active { color: #1f6f49; font-weight: 900; }
+    .panel {
+      border: 1px solid #dfe7dd;
+      border-radius: 12px;
+      background: #fff;
+      box-shadow: 0 14px 40px rgba(31, 79, 52, .07);
+      overflow: hidden;
+    }
+    .panel h2 { margin: 0; padding: 18px 20px; color: #1f6f49; border-bottom: 1px solid #e7eee5; }
+    .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; padding: 18px; }
+    .rule {
+      min-height: 190px;
+      padding: 16px;
+      border: 1px solid #dfe7dd;
+      border-radius: 10px;
+      background: #fbfcfa;
+    }
+    .rule strong { display: block; margin-bottom: 10px; color: #10251a; font-size: 17px; }
+    .rule p, .rule li { color: #64756c; font-size: 14px; line-height: 1.7; }
+    ul { margin: 0; padding-left: 18px; }
+    .matrix {
+      margin-top: 18px;
+      border: 1px solid #dfe7dd;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #fff;
+    }
+    .matrix div { display: grid; grid-template-columns: 190px 1fr 1fr; }
+    .matrix span { padding: 12px 14px; border-bottom: 1px solid #e7eee5; color: #33443a; font-size: 14px; }
+    .matrix div:first-child span { color: #10251a; background: #eef7f0; font-weight: 900; }
+    .matrix div:last-child span { border-bottom: 0; }
+    @media (max-width: 900px) {
+      main { padding: 18px; }
+      .layout, .grid { grid-template-columns: 1fr; }
+      .phone { width: 100%; max-width: 360px; margin: 0 auto; }
+      .matrix div { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<main>
+  <h1>移动端完整可操作：能力不降级，交互形态降复杂度</h1>
+  <p class="sub">移动端必须能完成后台主要闭环：查看态势、地块管理、观测录入、启动 Agent 分析、处理任务、查看报告。</p>
+
+  <section class="layout">
+    <div class="phone">
+      <div class="phone-head"><strong>农事工作台</strong><span>移动端完整操作模式</span></div>
+      <div class="phone-body">
+        <div class="metric-row"><div class="metric">高风险<b>3</b></div><div class="metric">待办任务<b>18</b></div></div>
+        <div class="card"><h3>今日优先处理</h3><div class="line"></div><div class="line"></div><div class="line"></div></div>
+        <div class="card"><h3>观测录入</h3><div class="line"></div><div class="line"></div><span class="primary">继续录入</span></div>
+        <div class="card"><h3>Agent 分析</h3><div class="line"></div><span class="primary">启动分析</span></div>
+      </div>
+      <div class="bottom-nav"><span class="active">工作台</span><span>地块</span><span>任务</span><span>报告</span></div>
+    </div>
+
+    <div>
+      <section class="panel">
+        <h2>移动端设计规则</h2>
+        <div class="grid">
+          <article class="rule"><strong>1. 导航</strong><ul><li>底部主导航承载高频入口。</li><li>更多模块放入抽屉菜单。</li><li>页面标题区保留返回、搜索、筛选。</li></ul></article>
+          <article class="rule"><strong>2. 列表与表格</strong><ul><li>桌面表格在移动端转为卡片列表。</li><li>批量操作进入选择模式。</li><li>筛选条件改为底部 Sheet。</li></ul></article>
+          <article class="rule"><strong>3. 表单录入</strong><ul><li>长表单分步骤：天气、土壤、苗情、病虫害、农事记录。</li><li>每步即时校验和草稿保存。</li><li>关键提交按钮固定底部。</li></ul></article>
+          <article class="rule"><strong>4. Agent 分析</strong><ul><li>移动端仍可启动分析。</li><li>工作台区上下堆叠。</li><li>Agent 时间线折叠展示，支持展开详情。</li></ul></article>
+        </div>
+      </section>
+
+      <section class="matrix">
+        <div><span>能力</span><span>桌面端</span><span>移动端</span></div>
+        <div><span>工作台</span><span>高密度多栏</span><span>指标卡 + 优先事项列表</span></div>
+        <div><span>地块管理</span><span>表格 + 筛选 + 批量</span><span>卡片列表 + 筛选 Sheet + 选择模式</span></div>
+        <div><span>观测录入</span><span>完整表单一屏/分区</span><span>分步骤表单 + 草稿保存</span></div>
+        <div><span>Agent 分析</span><span>左右工作台 + 时间线</span><span>上下堆叠 + 折叠时间线</span></div>
+        <div><span>任务处理</span><span>表格批量处理</span><span>任务卡 + 滑动/选择操作</span></div>
+        <div><span>报告归档</span><span>列表、详情、导出</span><span>列表、详情、分享/导出入口保留</span></div>
+      </section>
+    </div>
+  </section>
+</main>
+</body>
+</html>

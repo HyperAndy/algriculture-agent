@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Agent 分析页与响应式设计</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: #18241f;
+      background: #f5f7f4;
+      font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+    }
+    main { max-width: 1500px; margin: 0 auto; padding: 32px; }
+    h1 { margin: 0 0 8px; color: #10251a; font-size: 34px; }
+    .sub { margin: 0 0 24px; color: #64756c; }
+    .split { display: grid; grid-template-columns: 1fr 380px; gap: 18px; }
+    .panel {
+      border: 1px solid #dfe7dd;
+      border-radius: 12px;
+      background: #fff;
+      box-shadow: 0 14px 40px rgba(31, 79, 52, .07);
+      overflow: hidden;
+    }
+    .head { padding: 18px 20px; border-bottom: 1px solid #e7eee5; }
+    h2 { margin: 0; color: #1f6f49; font-size: 22px; }
+    .head p { margin: 8px 0 0; color: #64756c; font-size: 14px; }
+    .workspace { padding: 18px; display: grid; grid-template-columns: 300px 1fr; gap: 14px; }
+    .card {
+      border: 1px solid #dfe7dd;
+      border-radius: 10px;
+      background: #fbfcfa;
+      padding: 14px;
+    }
+    .card h3 { margin: 0 0 12px; color: #10251a; font-size: 16px; }
+    .line { height: 28px; border-bottom: 1px solid #e9eee8; }
+    .btn { display: inline-block; margin-top: 14px; padding: 9px 14px; border-radius: 7px; color: #fff; background: #1f6f49; font-weight: 800; }
+    .result-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .metric { min-height: 72px; padding: 12px; border-radius: 8px; background: #eef7f0; color: #1d3428; }
+    .metric b { display: block; margin-top: 8px; color: #1f6f49; font-size: 22px; }
+    .timeline { padding: 18px; display: grid; gap: 12px; }
+    .step {
+      display: grid;
+      grid-template-columns: 32px 1fr;
+      gap: 10px;
+      align-items: start;
+    }
+    .dot {
+      width: 28px; height: 28px; border-radius: 999px; display: grid; place-items: center;
+      color: #fff; background: #1f6f49; font-size: 13px; font-weight: 900;
+    }
+    .step div:last-child { padding-bottom: 12px; border-bottom: 1px solid #e7eee5; }
+    .step strong { display: block; color: #10251a; }
+    .step p { margin: 5px 0 0; color: #64756c; font-size: 13px; line-height: 1.55; }
+    .responsive {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+    .device {
+      min-height: 220px;
+      padding: 16px;
+      border: 1px solid #dfe7dd;
+      border-radius: 12px;
+      background: #fff;
+      box-shadow: 0 14px 40px rgba(31, 79, 52, .06);
+    }
+    .device h3 { margin: 0 0 10px; color: #1f6f49; }
+    .device p, .device li { color: #64756c; font-size: 14px; line-height: 1.7; }
+    ul { margin: 0; padding-left: 18px; }
+    @media (max-width: 900px) {
+      main { padding: 18px; }
+      .split, .workspace, .responsive { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Agent 分析页：工作台 + 时间线 + 响应式</h1>
+  <p class="sub">后台不做纯展示页。分析前提供专业操作区，分析后展示可追溯 Agent 时间线和报告结果。</p>
+
+  <section class="split">
+    <article class="panel">
+      <div class="head"><h2>分析工作台</h2><p>左侧确认地块和观测数据，右侧展示风险结论、建议和将生成的任务。</p></div>
+      <div class="workspace">
+        <div class="card">
+          <h3>输入数据</h3>
+          <div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div>
+          <span class="btn">启动 Agent 分析</span>
+        </div>
+        <div class="card">
+          <h3>分析结果</h3>
+          <div class="result-grid">
+            <div class="metric">风险等级<b>高</b></div>
+            <div class="metric">建议任务<b>4</b></div>
+            <div class="metric">置信度<b>86%</b></div>
+          </div>
+          <div class="line"></div><div class="line"></div><div class="line"></div>
+        </div>
+      </div>
+    </article>
+
+    <article class="panel">
+      <div class="head"><h2>Agent 时间线</h2><p>6 个 Agent 的输入、输出、状态和耗时可追溯。</p></div>
+      <div class="timeline">
+        <div class="step"><span class="dot">1</span><div><strong>田间感知</strong><p>汇总地块、天气、土壤、苗情和历史农事记录。</p></div></div>
+        <div class="step"><span class="dot">2</span><div><strong>作物诊断</strong><p>判断生育期、长势和缺水缺肥风险。</p></div></div>
+        <div class="step"><span class="dot">3</span><div><strong>风险预警</strong><p>识别干旱、高温、病虫草害等风险。</p></div></div>
+        <div class="step"><span class="dot">4</span><div><strong>水肥决策</strong><p>生成灌溉、追肥和窗口期建议。</p></div></div>
+        <div class="step"><span class="dot">5</span><div><strong>灾害应对</strong><p>形成应急处置方案。</p></div></div>
+        <div class="step"><span class="dot">6</span><div><strong>农事档案</strong><p>沉淀报告、任务和追溯记录。</p></div></div>
+      </div>
+    </article>
+  </section>
+
+  <section class="responsive">
+    <article class="device"><h3>桌面端 ≥ 1200px</h3><ul><li>侧边栏常驻。</li><li>工作台左右分栏。</li><li>表格、筛选、批量操作完整展示。</li></ul></article>
+    <article class="device"><h3>平板 768-1199px</h3><ul><li>侧边栏可折叠。</li><li>工作台上下堆叠。</li><li>关键操作固定在页面顶部或底部。</li></ul></article>
+    <article class="device"><h3>移动端 ＜ 768px</h3><ul><li>底部导航或抽屉菜单。</li><li>列表卡片化，表格降级为摘要卡。</li><li>录入表单分步骤，避免长页面压迫。</li></ul></article>
+  </section>
+</main>
+</body>
+</html>

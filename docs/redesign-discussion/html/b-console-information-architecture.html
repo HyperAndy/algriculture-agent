@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Console 信息架构</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: #18241f;
+      background: #f5f7f4;
+      font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+    }
+    main { max-width: 1500px; margin: 0 auto; padding: 32px; }
+    h1 { margin: 0 0 8px; color: #10251a; font-size: 34px; }
+    .sub { margin: 0 0 24px; color: #64756c; }
+    .shell {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      min-height: 720px;
+      border: 1px solid #d9e2d8;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #fff;
+      box-shadow: 0 20px 60px rgba(31, 79, 52, .08);
+    }
+    aside {
+      padding: 22px 16px;
+      background: #123b2b;
+      color: #e8f4ec;
+    }
+    .logo { margin-bottom: 22px; font-weight: 900; font-size: 20px; }
+    nav { display: grid; gap: 8px; }
+    nav span {
+      padding: 10px 12px;
+      border-radius: 7px;
+      background: rgba(255,255,255,.06);
+      color: #d8eadf;
+      font-size: 14px;
+    }
+    nav span.active { background: #1f6f49; color: #fff; }
+    section { padding: 24px; }
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .top h2 { margin: 0; font-size: 26px; color: #10251a; }
+    .btn { padding: 9px 14px; border-radius: 7px; color: #fff; background: #1f6f49; font-weight: 700; }
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .module {
+      min-height: 190px;
+      padding: 16px;
+      border: 1px solid #dfe7dd;
+      border-radius: 10px;
+      background: #fff;
+      box-shadow: 0 8px 24px rgba(31, 79, 52, .06);
+    }
+    .module h3 { margin: 0 0 10px; color: #1f6f49; font-size: 18px; }
+    .module p { margin: 0 0 12px; color: #64756c; font-size: 13px; line-height: 1.6; }
+    ul { margin: 0; padding-left: 18px; color: #26352d; font-size: 13px; line-height: 1.75; }
+    .flow {
+      margin-top: 18px;
+      padding: 18px;
+      border: 1px solid #dfe7dd;
+      border-radius: 10px;
+      background: #fbfcfa;
+    }
+    .flow h3 { margin: 0 0 14px; color: #10251a; }
+    .steps {
+      display: grid;
+      grid-template-columns: 1fr 34px 1fr 34px 1fr 34px 1fr;
+      align-items: stretch;
+      gap: 8px;
+    }
+    .step {
+      min-height: 76px;
+      display: grid;
+      place-items: center;
+      padding: 12px;
+      border: 1px solid #cfdcd0;
+      border-radius: 8px;
+      background: #fff;
+      text-align: center;
+      color: #1d3428;
+      font-weight: 800;
+      font-size: 14px;
+    }
+    .arrow { display: grid; place-items: center; color: #1f6f49; font-size: 24px; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>/console 企业级农业 SaaS 信息架构</h1>
+  <p class="sub">后台目标是高频工作闭环：地块建档 → 观测录入 → Agent 分析 → 任务执行 → 报告归档 → 工作台回看。</p>
+
+  <div class="shell">
+    <aside>
+      <div class="logo">AgriAgent</div>
+      <nav>
+        <span class="active">工作台</span>
+        <span>地块管理</span>
+        <span>观测录入</span>
+        <span>Agent 分析</span>
+        <span>农事任务</span>
+        <span>报告归档</span>
+      </nav>
+    </aside>
+    <section>
+      <div class="top">
+        <h2>业务模块边界</h2>
+        <span class="btn">新建观测</span>
+      </div>
+
+      <div class="grid">
+        <article class="module"><h3>1. 工作台</h3><p>全局态势与今日工作入口。</p><ul><li>核心指标</li><li>高风险地块</li><li>待办任务</li><li>近期报告</li></ul></article>
+        <article class="module"><h3>2. 地块管理</h3><p>农田生产对象主数据。</p><ul><li>地块列表</li><li>地块详情</li><li>作物与品种</li><li>风险状态</li></ul></article>
+        <article class="module"><h3>3. 观测录入</h3><p>触发分析前的数据采集。</p><ul><li>天气</li><li>土壤</li><li>苗情</li><li>病虫草害</li></ul></article>
+        <article class="module"><h3>4. Agent 分析</h3><p>多 Agent 协作与推理透明化。</p><ul><li>启动分析</li><li>步骤时间线</li><li>风险判断</li><li>建议生成</li></ul></article>
+        <article class="module"><h3>5. 农事任务</h3><p>把建议转成可执行任务。</p><ul><li>任务队列</li><li>优先级</li><li>状态流转</li><li>批量处理</li></ul></article>
+        <article class="module"><h3>6. 报告归档</h3><p>验收、复盘和追溯材料。</p><ul><li>报告列表</li><li>报告详情</li><li>导出</li><li>历史检索</li></ul></article>
+      </div>
+
+      <div class="flow">
+        <h3>核心业务闭环</h3>
+        <div class="steps">
+          <div class="step">地块建档</div><div class="arrow">→</div>
+          <div class="step">观测录入</div><div class="arrow">→</div>
+          <div class="step">Agent 分析</div><div class="arrow">→</div>
+          <div class="step">任务与报告</div>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+</body>
+</html>

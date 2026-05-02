@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>双前端视觉体系</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #071116;
+      color: #d8f3e8;
+      font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+    }
+    main { max-width: 1500px; margin: 0 auto; padding: 32px; }
+    h1 { margin: 0 0 8px; color: #fff; font-size: 34px; }
+    .sub { margin: 0 0 24px; color: #91b8b0; }
+    .split { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .panel {
+      border: 1px solid rgba(110,255,194,.24);
+      border-radius: 10px;
+      overflow: hidden;
+      background: rgba(3,18,24,.86);
+      box-shadow: 0 18px 44px rgba(0,0,0,.24);
+    }
+    .head { padding: 18px 20px; border-bottom: 1px solid rgba(110,255,194,.13); }
+    h2 { margin: 0; font-size: 24px; }
+    .big h2 { color: #9bf69e; }
+    .console h2 { color: #1f6f49; }
+    .head p { margin: 8px 0 0; color: #91b8b0; font-size: 14px; line-height: 1.6; }
+    .mock { height: 430px; padding: 16px; }
+    .big .mock {
+      background:
+        linear-gradient(90deg, rgba(126,231,135,.045) 1px, transparent 1px),
+        linear-gradient(rgba(126,231,135,.035) 1px, transparent 1px),
+        radial-gradient(circle at 50% 20%, rgba(51,214,255,.16), transparent 28%),
+        linear-gradient(135deg, #041114, #071c22 50%, #031014);
+      background-size: 34px 34px, 34px 34px, auto, auto;
+    }
+    .screen-title {
+      height: 54px;
+      margin-bottom: 12px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(51,214,255,.24);
+      border-radius: 8px;
+      color: #fff;
+      font-size: 22px;
+      font-weight: 900;
+      background: rgba(6,34,40,.68);
+    }
+    .big-grid {
+      display: grid;
+      grid-template-columns: 22% 1fr 24%;
+      gap: 10px;
+      height: calc(100% - 66px);
+    }
+    .big-card {
+      border: 1px solid rgba(110,255,194,.24);
+      border-radius: 7px;
+      background: rgba(6,34,40,.76);
+      box-shadow: inset 0 0 24px rgba(45,211,191,.09);
+    }
+    .big-card.map {
+      background:
+        radial-gradient(circle at 45% 44%, rgba(126,231,135,.18), transparent 35%),
+        linear-gradient(135deg, rgba(43,92,41,.6), rgba(7,28,34,.85));
+    }
+    .stack { display: grid; gap: 10px; }
+    .console .mock {
+      color: #17261f;
+      background: #f6f8f5;
+    }
+    .console-shell {
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      height: 100%;
+      border: 1px solid #d9e2d8;
+      border-radius: 10px;
+      overflow: hidden;
+      background: #fff;
+    }
+    .sidebar {
+      padding: 16px 12px;
+      background: #113c2b;
+      color: #e8f4ec;
+    }
+    .logo { font-weight: 900; margin-bottom: 22px; }
+    .nav { display: grid; gap: 8px; }
+    .nav span { padding: 9px 10px; border-radius: 6px; background: rgba(255,255,255,.06); font-size: 13px; }
+    .content { padding: 18px; display: grid; gap: 14px; align-content: start; }
+    .toolbar { display: flex; justify-content: space-between; align-items: center; }
+    .toolbar strong { font-size: 22px; }
+    .button { padding: 8px 12px; border-radius: 6px; color: #fff; background: #1f6f49; font-size: 13px; }
+    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+    .stat, .table {
+      border: 1px solid #dfe7dd;
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 0 6px 20px rgba(31,79,52,.06);
+    }
+    .stat { padding: 12px; min-height: 72px; }
+    .stat b { display: block; margin-top: 10px; color: #1f6f49; font-size: 22px; }
+    .table { min-height: 178px; padding: 12px; }
+    .line { height: 22px; border-bottom: 1px solid #eef2ed; }
+    .tokens {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+    .token {
+      min-height: 150px;
+      padding: 16px;
+      border: 1px solid rgba(110,255,194,.18);
+      border-radius: 8px;
+      background: rgba(3,18,24,.76);
+    }
+    .token h3 { margin: 0 0 10px; color: #f5c84c; font-size: 17px; }
+    .token p { margin: 0; color: #bdd8d1; line-height: 1.7; font-size: 14px; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>B 方案前端视觉体系：大屏与后台分离</h1>
+  <p class="sub">大屏负责展示冲击力，后台负责工作效率。两者共享业务语义，不共享视觉密度和动效策略。</p>
+
+  <section class="split">
+    <article class="panel big">
+      <div class="head">
+        <h2>/demo 大屏：农业指挥中心</h2>
+        <p>深色、科技感、动效强、适合资金申请和路演展示。</p>
+      </div>
+      <div class="mock">
+        <div class="screen-title">AI 驱动的大田作物稳产减灾决策平台</div>
+        <div class="big-grid">
+          <div class="stack"><div class="big-card"></div><div class="big-card"></div><div class="big-card"></div></div>
+          <div class="big-card map"></div>
+          <div class="stack"><div class="big-card"></div><div class="big-card"></div></div>
+        </div>
+      </div>
+    </article>
+
+    <article class="panel console">
+      <div class="head">
+        <h2>/console 后台：企业级农业 SaaS</h2>
+        <p>浅底或低饱和主题、高密度信息、表单列表优先、适合长期使用。</p>
+      </div>
+      <div class="mock">
+        <div class="console-shell">
+          <aside class="sidebar">
+            <div class="logo">AgriAgent</div>
+            <nav class="nav">
+              <span>工作台</span><span>地块管理</span><span>观测录入</span><span>Agent 分析</span><span>任务队列</span><span>报告归档</span>
+            </nav>
+          </aside>
+          <section class="content">
+            <div class="toolbar"><strong>农事工作台</strong><span class="button">新建观测</span></div>
+            <div class="stats"><div class="stat">地块<b>24</b></div><div class="stat">高风险<b>3</b></div><div class="stat">待办<b>18</b></div><div class="stat">报告<b>42</b></div></div>
+            <div class="table"><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div></div>
+          </section>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <section class="tokens">
+    <article class="token"><h3>共享</h3><p>业务枚举、风险等级颜色语义、作物类型、基础 UI primitive、图标库、格式化工具。</p></article>
+    <article class="token"><h3>隔离</h3><p>页面布局、CSS token、动效强度、图表主题、大屏地图组件、后台表单和表格样式。</p></article>
+    <article class="token"><h3>推荐目录</h3><p>`design-system/big-screen` 与 `design-system/console` 分开；`features/dashboard` 输出不同 ViewModel。</p></article>
+  </section>
+</main>
+</body>
+</html>

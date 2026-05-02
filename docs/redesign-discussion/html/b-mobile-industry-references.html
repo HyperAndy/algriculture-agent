@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>移动端工业界参考</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: #18241f;
+      background: #f5f7f4;
+      font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+    }
+    main { max-width: 1500px; margin: 0 auto; padding: 32px; }
+    h1 { margin: 0 0 8px; color: #10251a; font-size: 34px; }
+    .sub { margin: 0 0 24px; color: #64756c; }
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .card {
+      min-height: 280px;
+      padding: 18px;
+      border: 1px solid #dfe7dd;
+      border-radius: 12px;
+      background: #fff;
+      box-shadow: 0 14px 40px rgba(31, 79, 52, .07);
+    }
+    .card h2 { margin: 0 0 10px; color: #1f6f49; font-size: 20px; }
+    .tag {
+      display: inline-block;
+      margin-bottom: 12px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      color: #1f6f49;
+      background: #eef7f0;
+      font-size: 12px;
+      font-weight: 800;
+    }
+    ul { margin: 0; padding-left: 18px; color: #43544a; line-height: 1.75; font-size: 14px; }
+    .pattern {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+    .phone {
+      width: 340px;
+      min-height: 690px;
+      border: 10px solid #14251c;
+      border-radius: 34px;
+      background: #f7faf6;
+      overflow: hidden;
+      box-shadow: 0 22px 60px rgba(16, 37, 26, .22);
+    }
+    .phone-head { padding: 18px; color: #fff; background: #123b2b; }
+    .phone-head strong { display: block; font-size: 18px; }
+    .phone-head span { color: #cfe7d8; font-size: 12px; }
+    .body { padding: 14px; display: grid; gap: 12px; }
+    .kpis { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .kpi, .panel {
+      border: 1px solid #dfe7dd;
+      border-radius: 12px;
+      background: #fff;
+      box-shadow: 0 8px 24px rgba(31, 79, 52, .06);
+    }
+    .kpi { padding: 12px; min-height: 76px; color: #64756c; font-size: 12px; }
+    .kpi b { display: block; margin-top: 8px; color: #1f6f49; font-size: 22px; }
+    .panel { padding: 14px; }
+    .panel h3 { margin: 0 0 10px; font-size: 15px; }
+    .line { height: 26px; border-bottom: 1px solid #edf2ec; }
+    .btn { display: block; margin-top: 12px; padding: 10px; border-radius: 9px; text-align: center; color: #fff; background: #1f6f49; font-weight: 900; }
+    .nav { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid #dfe7dd; background: #fff; }
+    .nav span { padding: 10px 4px; text-align: center; color: #64756c; font-size: 12px; }
+    .nav .active { color: #1f6f49; font-weight: 900; }
+    .rules {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+    .rule {
+      padding: 16px;
+      border: 1px solid #dfe7dd;
+      border-radius: 12px;
+      background: #fff;
+    }
+    .rule strong { display: block; margin-bottom: 8px; color: #10251a; }
+    .rule p { margin: 0; color: #64756c; line-height: 1.65; font-size: 14px; }
+    @media (max-width: 900px) {
+      main { padding: 18px; }
+      .grid, .pattern, .rules { grid-template-columns: 1fr; }
+      .phone { width: 100%; max-width: 360px; margin: 0 auto; }
+    }
+  </style>
+</head>
+<body>
+<main>
+  <h1>移动端样式参考：企业级农业 SaaS</h1>
+  <p class="sub">参考 Material Design、Ant Design、SaaS Dashboard 和企业移动端实践，形成适合本项目的移动端交互规范。</p>
+
+  <section class="grid">
+    <article class="card">
+      <span class="tag">Material Design</span>
+      <h2>底部导航 + Bottom Sheet</h2>
+      <ul>
+        <li>底部导航只放 3-5 个一级高频入口。</li>
+        <li>筛选、更多操作、批量动作放 Bottom Sheet。</li>
+        <li>触控目标不小于 44px，避免误触。</li>
+      </ul>
+    </article>
+    <article class="card">
+      <span class="tag">Ant Design</span>
+      <h2>清晰导航 + 分步骤任务</h2>
+      <ul>
+        <li>减少页面跳转，保证用户知道当前位置。</li>
+        <li>复杂录入用 Steps 拆成明确流程。</li>
+        <li>列表、表单、反馈组件保持一致。</li>
+      </ul>
+    </article>
+    <article class="card">
+      <span class="tag">Enterprise UX</span>
+      <h2>任务优先，不追求娱乐化</h2>
+      <ul>
+        <li>用户目标是完成工作，不是探索页面。</li>
+        <li>优先展示待处理事项和下一步动作。</li>
+        <li>弱化装饰，强化状态、反馈、错误恢复。</li>
+      </ul>
+    </article>
+  </section>
+
+  <section class="pattern">
+    <div class="phone">
+      <div class="phone-head"><strong>农事工作台</strong><span>完整操作移动端</span></div>
+      <div class="body">
+        <div class="kpis"><div class="kpi">高风险<b>3</b></div><div class="kpi">待执行<b>18</b></div></div>
+        <div class="panel"><h3>下一步任务</h3><div class="line"></div><div class="line"></div><span class="btn">处理任务</span></div>
+        <div class="panel"><h3>观测录入</h3><div class="line"></div><div class="line"></div><span class="btn">继续录入</span></div>
+        <div class="panel"><h3>Agent 分析</h3><div class="line"></div><span class="btn">启动分析</span></div>
+      </div>
+      <div class="nav"><span class="active">工作台</span><span>地块</span><span>任务</span><span>报告</span></div>
+    </div>
+    <div class="rules">
+      <article class="rule"><strong>1. 首页不是仪表墙</strong><p>移动端只展示关键 KPI、风险事项、今日任务和主操作入口，避免桌面端指标全部塞入。</p></article>
+      <article class="rule"><strong>2. 表格卡片化</strong><p>地块、任务、报告列表在移动端变成摘要卡；详细字段进入详情页或展开区域。</p></article>
+      <article class="rule"><strong>3. 录入分步骤</strong><p>天气、土壤、苗情、病虫草害、农事记录分步完成，支持草稿保存。</p></article>
+      <article class="rule"><strong>4. 操作固定可达</strong><p>关键提交、启动分析、保存任务等按钮固定在底部或当前卡片底部。</p></article>
+      <article class="rule"><strong>5. 筛选用 Sheet</strong><p>移动端筛选和批量操作用底部 Sheet，不占据主列表空间。</p></article>
+      <article class="rule"><strong>6. 状态反馈明确</strong><p>长任务显示运行中、失败重试、上次同步时间；不出现无解释空白。</p></article>
+    </div>
+  </section>
+</main>
+</body>
+</html>

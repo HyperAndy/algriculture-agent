@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>项目重设计讨论板</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: #d8f3e8;
+      background:
+        linear-gradient(90deg, rgba(126,231,135,.045) 1px, transparent 1px),
+        linear-gradient(rgba(126,231,135,.035) 1px, transparent 1px),
+        radial-gradient(circle at 52% 12%, rgba(51,214,255,.16), transparent 28%),
+        linear-gradient(135deg, #041114, #071c22 50%, #031014);
+      background-size: 44px 44px, 44px 44px, auto, auto;
+      font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+    }
+    main { max-width: 1440px; margin: 0 auto; padding: 34px; }
+    h1 { margin: 0 0 8px; font-size: 34px; color: #fff; }
+    .sub { margin: 0 0 28px; color: #91b8b0; }
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    .card {
+      min-height: 430px;
+      border: 1px solid rgba(110,255,194,.28);
+      border-radius: 8px;
+      background: linear-gradient(180deg, rgba(8,40,48,.86), rgba(3,18,24,.88));
+      box-shadow: inset 0 0 28px rgba(45,211,191,.08), 0 18px 50px rgba(0,0,0,.28);
+      overflow: hidden;
+    }
+    .head { padding: 18px 18px 14px; border-bottom: 1px solid rgba(110,255,194,.16); }
+    .tag { display: inline-block; margin-bottom: 10px; padding: 3px 8px; border: 1px solid rgba(126,231,135,.42); border-radius: 4px; color: #9bf69e; font-size: 12px; }
+    h2 { margin: 0; font-size: 21px; color: #a5f7a4; }
+    .body { padding: 18px; display: grid; gap: 14px; }
+    .diagram {
+      height: 150px;
+      border: 1px solid rgba(51,214,255,.18);
+      border-radius: 6px;
+      background: rgba(0,0,0,.18);
+      display: grid;
+      align-content: center;
+      gap: 10px;
+      padding: 14px;
+    }
+    .row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; align-items: center; }
+    .node { padding: 9px 8px; border: 1px solid rgba(126,231,135,.28); border-radius: 6px; text-align: center; font-size: 12px; background: rgba(126,231,135,.08); }
+    .wide { grid-column: 1 / -1; }
+    ul { margin: 0; padding-left: 18px; color: #c6ded8; line-height: 1.8; font-size: 14px; }
+    .rec { border-color: rgba(245,200,76,.5); box-shadow: inset 0 0 34px rgba(245,200,76,.08), 0 18px 50px rgba(0,0,0,.28); }
+    .rec .tag { color: #f5c84c; border-color: rgba(245,200,76,.55); }
+    .footer {
+      margin-top: 22px;
+      padding: 18px;
+      border: 1px solid rgba(110,255,194,.22);
+      border-radius: 8px;
+      color: #b8d7ce;
+      background: rgba(3,18,24,.72);
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>大田作物 Agent 平台重设计：三种架构方向</h1>
+    <p class="sub">目标不是“再补 CSS”，而是重新定义边界：业务内核、Agent 编排、数据层、管理后台、大屏演示层各自独立。</p>
+    <section class="grid">
+      <article class="card">
+        <div class="head"><span class="tag">A 稳妥重构</span><h2>保留 Next 单体，重做分层</h2></div>
+        <div class="body">
+          <div class="diagram">
+            <div class="row"><div class="node">/demo</div><div class="node">/console</div><div class="node">API Routes</div></div>
+            <div class="row"><div class="node wide">Application Services: Field / Observation / AgentRun / Task / Report</div></div>
+            <div class="row"><div class="node">Domain</div><div class="node">Prisma Repo</div><div class="node">Agent Provider</div></div>
+          </div>
+          <ul>
+            <li>改动风险最低，适合当前 MVP 快速变专业。</li>
+            <li>把 `command-center.tsx` 拆成大屏组件库和数据 ViewModel。</li>
+            <li>适合资金申请演示和真实后台同时推进。</li>
+          </ul>
+        </div>
+      </article>
+      <article class="card rec">
+        <div class="head"><span class="tag">B 推荐</span><h2>模块化单体 + 双前端体验</h2></div>
+        <div class="body">
+          <div class="diagram">
+            <div class="row"><div class="node">Big Screen Kit</div><div class="node">SaaS Console Kit</div><div class="node">Shared UI Tokens</div></div>
+            <div class="row"><div class="node wide">Feature Modules: fields / observations / agent-runs / tasks / reports / dashboard</div></div>
+            <div class="row"><div class="node">Domain Rules</div><div class="node">Repositories</div><div class="node">Agent Runtime</div></div>
+          </div>
+          <ul>
+            <li>大屏和后台风格完全分离，但共享业务数据与领域模型。</li>
+            <li>引入设计令牌、组件分层、Mock/LLM Agent 可替换接口。</li>
+            <li>后续可以平滑扩展到多租户、真实传感器、地图服务。</li>
+          </ul>
+        </div>
+      </article>
+      <article class="card">
+        <div class="head"><span class="tag">C 长期平台</span><h2>前后端拆分 + Agent 服务化</h2></div>
+        <div class="body">
+          <div class="diagram">
+            <div class="row"><div class="node">Next Web</div><div class="node">API Service</div><div class="node">Agent Worker</div></div>
+            <div class="row"><div class="node">Queue</div><div class="node">Postgres</div><div class="node">Object Store</div></div>
+            <div class="row"><div class="node wide">Telemetry / Auth / Multi-tenant / GIS Integration</div></div>
+          </div>
+          <ul>
+            <li>最接近正式 SaaS/政企交付架构。</li>
+            <li>当前阶段成本较高，容易拖慢可演示成果。</li>
+            <li>适合拿到资金后做二期平台化。</li>
+          </ul>
+        </div>
+      </article>
+    </section>
+    <div class="footer">建议先选 B：用模块化单体把质量提起来，同时给二期服务化留接口。</div>
+  </main>
+</body>
+</html>

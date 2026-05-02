@@ -18,6 +18,14 @@ import { RiskBadge } from "@/components/console/risk-badge"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
 
+function formatDate(iso: string) {
+  const d = new Date(iso)
+  const y = d.getFullYear()
+  const mo = String(d.getMonth() + 1).padStart(2, "0")
+  const day = String(d.getDate()).padStart(2, "0")
+  return `${y}-${mo}-${day}`
+}
+
 type AgentRun = {
   id: string
   fieldName: string
@@ -120,11 +128,7 @@ export function ArchiveClient({
                         </span>
                         <span className="mx-1 opacity-40">|</span>
                         <span>
-                          {new Date(run.createdAt).toLocaleDateString("zh-CN", {
-                            year: "numeric",
-                            month: "short",
-                            day: "numeric",
-                          })}
+                          {formatDate(run.createdAt)}
                         </span>
                       </div>
                       <p className="line-clamp-2 text-sm text-muted-foreground">

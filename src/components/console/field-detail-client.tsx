@@ -142,7 +142,7 @@ export function FieldDetailClient({ field }: { field: FieldDetail }) {
         </TabsList>
 
         <TabsContent value="overview" className="mt-6 space-y-6">
-          <div className="grid gap-6 lg:grid-cols-[1fr_280px]">
+          <div className="grid gap-6 grid-cols-1 lg:grid-cols-[1fr_280px]">
             <Card>
               <CardHeader>
                 <CardTitle>最新观测</CardTitle>

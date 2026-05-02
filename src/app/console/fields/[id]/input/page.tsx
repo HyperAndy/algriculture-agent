@@ -229,7 +229,7 @@ export default function ObservationInputPage() {
         </h1>
       </div>
 
-      <div className="flex items-center justify-center gap-4 border-b pb-4">
+      <div className="flex items-center justify-center gap-4 border-b pb-4 overflow-x-auto flex-nowrap">
         {steps.map((step, i) => (
           <div key={i} className="flex items-center gap-2">
             <div className="flex items-center gap-2 text-sm">
@@ -567,7 +567,7 @@ export default function ObservationInputPage() {
         </CardContent>
       </Card>
 
-      <div className="flex justify-end">
+      <div className="flex flex-col sm:flex-row justify-end gap-2">
         <Button onClick={handleSubmit} disabled={loading} size="lg">
           {loading ? (
             <>

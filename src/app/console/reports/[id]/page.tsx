@@ -98,7 +98,7 @@ export default async function ReportDetailPage({
               className="no-print"
             >
               <Printer className="size-3.5" />
-              打印
+              <span className="hidden sm:inline">打印</span>
             </Button>
           </div>
         }

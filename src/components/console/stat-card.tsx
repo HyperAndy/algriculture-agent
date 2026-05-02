@@ -43,7 +43,7 @@ export function StatCard({
       <CardContent>
         <div className="flex items-baseline gap-1">
           <span className="text-2xl font-bold tabular-nums">{animated.toLocaleString()}</span>
-          {unit && <span className="text-sm text-muted-foreground">{unit}</span>}
+          {unit && <span className="text-sm text-muted-foreground hidden sm:inline">{unit}</span>}
         </div>
         {trend && trendLabel && (
           <div className="mt-1 flex items-center gap-1 text-xs">

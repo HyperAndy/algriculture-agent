@@ -58,7 +58,7 @@ export function TasksClient({ tasks }: { tasks: Task[] }) {
     <div className="space-y-6">
       <PageHeader title="农事任务" />
 
-      <div className="flex flex-wrap items-center justify-between gap-4">
+      <div className="flex flex-wrap items-center justify-between gap-4 overflow-x-auto">
         <Tabs value={statusFilter} onValueChange={setStatusFilter}>
           <TabsList>
             <TabsTrigger value="all">全部</TabsTrigger>
@@ -117,11 +117,11 @@ export function TasksClient({ tasks }: { tasks: Task[] }) {
           ))}
         </div>
       ) : (
-        <div className="grid grid-cols-3 gap-4">
+        <div className="flex overflow-x-auto gap-4">
           {(["pending", "in-progress", "completed"] as const).map((columnStatus) => {
             const columnTasks = filteredTasks.filter((t) => t.status === columnStatus)
             return (
-              <div key={columnStatus} className="space-y-3">
+              <div key={columnStatus} className="min-w-[280px] flex-1 space-y-3">
                 <div className="flex items-center gap-2">
                   <h3 className="text-sm font-medium text-muted-foreground">
                     {statusLabel[columnStatus]}

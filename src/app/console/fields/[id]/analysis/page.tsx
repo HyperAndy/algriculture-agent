@@ -190,9 +190,9 @@ export default function AnalysisPage() {
         <CardHeader className="border-b">
           <CardTitle>最新观测摘要</CardTitle>
         </CardHeader>
-        <CardContent className="pt-4">
+        <CardContent className="px-3 sm:px-6 pt-4">
           {latestObservation ? (
-            <div className="grid gap-3 text-sm md:grid-cols-2 lg:grid-cols-4">
+            <div className="grid gap-3 text-sm grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
               <div>
                 <span className="text-muted-foreground">温度：</span>
                 <span className="font-medium">{latestObservation.temperatureC}℃</span>

@@ -115,7 +115,7 @@ export default async function ConsolePage() {
         />
       ) : (
         <>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
             <StatCard
               icon={<MapPinned className="size-4" />}
               label="总地块数"
@@ -147,7 +147,7 @@ export default async function ConsolePage() {
             />
           </div>
 
-          <div className="grid gap-4 lg:grid-cols-2">
+          <div className="grid gap-4 grid-cols-1 lg:grid-cols-2">
             <Card>
               <CardHeader>
                 <CardTitle>风险态势趋势</CardTitle>
@@ -174,7 +174,7 @@ export default async function ConsolePage() {
             </Card>
           </div>
 
-          <div className="grid gap-4 lg:grid-cols-2">
+          <div className="grid gap-4 grid-cols-1 lg:grid-cols-2">
             <Card>
               <CardHeader>
                 <CardTitle>近期分析</CardTitle>

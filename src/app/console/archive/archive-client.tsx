@@ -72,14 +72,14 @@ export function ArchiveClient({
     <div className="space-y-6">
       <PageHeader title="农事档案" />
 
-      <div className="flex flex-wrap items-center gap-3">
+      <div className="flex flex-col sm:flex-row sm:flex-wrap items-start sm:items-center gap-3">
         <div className="relative">
           <Search className="absolute left-2 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder="搜索田块或摘要..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="h-8 w-56 pl-7 text-sm"
+            className="h-8 w-full sm:w-56 pl-7 text-sm"
           />
         </div>
         <Select

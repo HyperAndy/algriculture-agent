@@ -84,7 +84,7 @@ export function FieldListClient({ fields }: { fields: Field[] }) {
         }
       />
 
-      <div className="flex flex-wrap items-center gap-3">
+      <div className="flex flex-wrap items-center gap-3 overflow-x-auto">
         <FilterBar
           filters={filters}
           onFilterChange={(key, value) => {
@@ -99,7 +99,7 @@ export function FieldListClient({ fields }: { fields: Field[] }) {
             placeholder="搜索地块名称/位置..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="h-8 w-56 pl-7 text-sm"
+            className="h-8 w-full sm:w-56 pl-7 text-sm"
           />
         </div>
       </div>
@@ -111,7 +111,7 @@ export function FieldListClient({ fields }: { fields: Field[] }) {
           description="当前筛选条件下没有匹配的地块"
         />
       ) : (
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((field) => (
             <FieldCard key={field.id} field={field} />
           ))}

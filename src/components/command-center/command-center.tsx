@@ -15,7 +15,6 @@ import {
   FileText,
   Layers,
   Leaf,
-  Map,
   RadioTower,
   ScanLine,
   Sprout,
@@ -25,7 +24,6 @@ import {
   Wind,
   Zap
 } from "lucide-react";
-import { clsx } from "clsx";
 import { COMMAND_CROP_COLORS } from "@/design-system/big-screen/theme";
 import { CROP_LABELS } from "@/domain/crops/crop-labels";
 import type { CommandAgentStep, CommandCenterData, CommandField, CommandTask } from "./types";
@@ -43,6 +41,9 @@ import {
 import { EChart } from "./echart";
 import { PanelTitle } from "./panel-title";
 import { TopBar } from "./top-bar";
+import { SituationMetricsPanel } from "./situation-metrics-panel";
+import { CropDistributionPanel } from "./crop-distribution-panel";
+import { GrowthStagePanel } from "./growth-stage-panel";
 
 const MAP_ZONES = [
   { crop: "wheat", risk: "medium", label: "小麦", points: "178,180 372,136 430,252 216,284", labelX: 282, labelY: 226, iconX: 278, iconY: 208 },
@@ -71,17 +72,17 @@ export function CommandCenter({ data }: { data: CommandCenterData }) {
 
         <section className="sci-panel sci-situation">
           <PanelTitle icon={<Tractor size={18} />} title="综合态势" />
-          <MetricGrid fieldsCount={fields.length} totalArea={totalArea} highRisk={highRisk} pendingTasks={pendingTasks} />
+          <SituationMetricsPanel fieldsCount={fields.length} totalArea={totalArea} highRisk={highRisk} pendingTasks={pendingTasks} />
         </section>
 
         <section className="sci-panel sci-crop">
           <PanelTitle icon={<Sprout size={18} />} title="作物种植分布（亩）" />
-          <CropDonut fields={fields} totalArea={totalArea} />
+          <CropDistributionPanel fields={fields} totalArea={totalArea} />
         </section>
 
         <section className="sci-panel sci-growth">
           <PanelTitle icon={<Wheat size={18} />} title="生育期分布" />
-          <GrowthBars fields={fields} />
+          <GrowthStagePanel fields={fields} />
         </section>
 
         <section className="sci-panel sci-map">
@@ -120,105 +121,6 @@ export function CommandCenter({ data }: { data: CommandCenterData }) {
         </section>
       </div>
     </main>
-  );
-}
-
-function MetricGrid({ fieldsCount, totalArea, highRisk, pendingTasks }: { fieldsCount: number; totalArea: number; highRisk: number; pendingTasks: number }) {
-  const items = [
-    { icon: <Map size={32} />, label: "管理地块", value: fieldsCount, unit: "块" },
-    { icon: <ScanLine size={32} />, label: "覆盖面积", value: totalArea, unit: "亩" },
-    { icon: <AlertTriangle size={32} />, label: "高风险地块", value: highRisk, unit: "块", danger: true },
-    { icon: <ClipboardList size={32} />, label: "待办农事", value: pendingTasks, unit: "项" }
-  ];
-
-  return (
-    <div className="sci-metrics">
-      {items.map((item) => (
-        <div className={clsx("sci-metric", item.danger && "is-danger")} key={item.label}>
-          <span className="sci-metric-icon">{item.icon}</span>
-          <span className="sci-metric-label" title={item.label}>{item.label}</span>
-          <strong>{item.value}</strong>
-          <em>{item.unit}</em>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function CropDonut({ fields, totalArea }: { fields: CommandField[]; totalArea: number }) {
-  const option = useMemo<EChartsOption>(() => {
-    const data = fields.map((field) => ({
-      name: CROP_LABELS[field.cropType] ?? field.cropType,
-      value: field.areaMu,
-      itemStyle: { color: COMMAND_CROP_COLORS[field.cropType] ?? "#7ee787" }
-    }));
-
-    return {
-      animationDuration: 1200,
-      series: [
-        {
-          type: "pie",
-          radius: ["54%", "82%"],
-          center: ["50%", "50%"],
-          avoidLabelOverlap: true,
-          label: { show: false },
-          labelLine: { show: false },
-          itemStyle: { borderColor: "#06232b", borderWidth: 2 },
-          data
-        }
-      ]
-    };
-  }, [fields]);
-
-  return (
-    <div className="sci-donut-wrap">
-      <div className="sci-donut-visual">
-        <EChart option={option} className="sci-donut-chart" />
-        <div className="sci-donut-total"><span>总面积</span><b>{Math.round(totalArea)}亩</b></div>
-      </div>
-      <div className="sci-crop-legend">
-        {fields.map((field) => {
-          const percent = totalArea ? ((field.areaMu / totalArea) * 100).toFixed(1) : "0.0";
-          return (
-            <div key={field.id}>
-              <i style={{ background: COMMAND_CROP_COLORS[field.cropType] }} />
-              <span>{CROP_LABELS[field.cropType]}</span>
-              <b>{Math.round(field.areaMu)}</b>
-              <em>({percent}%)</em>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-function GrowthBars({ fields }: { fields: CommandField[] }) {
-  const stages = [
-    { label: "播种期", color: "#2ec46b", values: [10, 5, 8, 12] },
-    { label: "苗期", color: "#34a865", values: [20, 15, 20, 18] },
-    { label: "拔节期", color: "#2cc16f", values: [30, 25, 35, 30] },
-    { label: "孕穗期", color: "#f1c137", values: [25, 35, 25, 20] },
-    { label: "灌浆期", color: "#3d88d8", values: [15, 20, 12, 20] }
-  ];
-
-  return (
-    <div className="sci-growth-bars">
-      {fields.map((field, fieldIndex) => (
-        <div className="sci-growth-row" key={field.id}>
-          <span>{CROP_LABELS[field.cropType]}</span>
-          <div>
-            {stages.map((stage) => (
-              <i key={stage.label} title={`${CROP_LABELS[field.cropType]} ${stage.label}: ${stage.values[fieldIndex] ?? 10}%`} style={{ width: `${stage.values[fieldIndex] ?? 10}%`, background: stage.color }}>{stage.values[fieldIndex] ?? 10}%</i>
-            ))}
-          </div>
-        </div>
-      ))}
-      <div className="sci-growth-axis"><span>0%</span><span>20%</span><span>40%</span><span>60%</span><span>80%</span><span>100%</span></div>
-      <div className="sci-growth-legend">
-        {stages.map((stage) => <span key={stage.label}><i style={{ background: stage.color }} />{stage.label}</span>)}
-      </div>
-    </div>
   );
 }
 

@@ -1,11 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import * as echarts from "echarts";
+import { useMemo, useState } from "react";
+import type { EChartsOption } from "echarts";
 import {
   AlertTriangle,
   Bot,
-  CheckCircle2,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
@@ -17,7 +16,6 @@ import {
   Layers,
   Leaf,
   Map,
-  Menu,
   RadioTower,
   ScanLine,
   Sprout,
@@ -42,6 +40,9 @@ import {
   riskLabel,
   riskValue,
 } from "./model";
+import { EChart } from "./echart";
+import { PanelTitle } from "./panel-title";
+import { TopBar } from "./top-bar";
 
 const MAP_ZONES = [
   { crop: "wheat", risk: "medium", label: "小麦", points: "178,180 372,136 430,252 216,284", labelX: 282, labelY: 226, iconX: 278, iconY: 208 },
@@ -66,7 +67,7 @@ export function CommandCenter({ data }: { data: CommandCenterData }) {
   return (
     <main className="sci-screen">
       <div className="sci-board">
-        <TopBar initialNow={data.generatedAt} formattedTime={data.formattedTime} dataSourceText={dataSourceText} />
+        <TopBar formattedTime={data.formattedTime} dataSourceText={dataSourceText} />
 
         <section className="sci-panel sci-situation">
           <PanelTitle icon={<Tractor size={18} />} title="综合态势" />
@@ -122,62 +123,6 @@ export function CommandCenter({ data }: { data: CommandCenterData }) {
   );
 }
 
-function TopBar({
-  initialNow,
-  formattedTime,
-  dataSourceText
-}: {
-  initialNow: string;
-  formattedTime: string;
-  dataSourceText: string;
-}) {
-  const [timeText, setTimeText] = useState(formattedTime);
-
-  useEffect(() => {
-    const timer = window.setInterval(() => {
-      const d = new Date();
-      const y = d.getFullYear();
-      const mo = String(d.getMonth() + 1).padStart(2, "0");
-      const day = String(d.getDate()).padStart(2, "0");
-      const h = String(d.getHours()).padStart(2, "0");
-      const mi = String(d.getMinutes()).padStart(2, "0");
-      const s = String(d.getSeconds()).padStart(2, "0");
-      setTimeText(`${y}-${mo}-${day} ${h}:${mi}:${s}`);
-    }, 1000);
-    return () => window.clearInterval(timer);
-  }, []);
-
-  return (
-    <header className="sci-top">
-      <div className="sci-top-left sci-ambient-strip">
-        <span><CloudSun size={16} /> 26℃</span>
-        <span>多云转晴</span>
-        <span><Droplets size={16} /> 湿度 68%</span>
-        <span><Wind size={16} /> 东南风 2级</span>
-      </div>
-      <div className="sci-title">
-        <h1>AI驱动的大田作物稳产减灾决策平台</h1>
-        <p>水 稻 <b>|</b> 小 麦 <b>|</b> 玉 米 <b>|</b> 大 豆</p>
-      </div>
-      <div className="sci-top-right sci-ambient-strip">
-        <span>{timeText}</span>
-        <span className="sci-online"><CheckCircle2 size={16} /> 系统正常</span>
-        <span className="sci-data-source">{dataSourceText}</span>
-        <Menu size={18} />
-      </div>
-    </header>
-  );
-}
-
-function PanelTitle({ icon, title }: { icon?: ReactNode; title: string }) {
-  return (
-    <div className="sci-panel-title">
-      {icon ? <span>{icon}</span> : null}
-      <h2>{title}</h2>
-    </div>
-  );
-}
-
 function MetricGrid({ fieldsCount, totalArea, highRisk, pendingTasks }: { fieldsCount: number; totalArea: number; highRisk: number; pendingTasks: number }) {
   const items = [
     { icon: <Map size={32} />, label: "管理地块", value: fieldsCount, unit: "块" },
@@ -200,46 +145,30 @@ function MetricGrid({ fieldsCount, totalArea, highRisk, pendingTasks }: { fields
   );
 }
 
-function EChart({ option, className }: { option: echarts.EChartsOption; className: string }) {
-  const ref = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    if (!ref.current) return;
-    const chart = echarts.init(ref.current, undefined, { renderer: "canvas" });
-    chart.setOption(option);
-    const resize = () => chart.resize();
-    window.addEventListener("resize", resize);
-    return () => {
-      window.removeEventListener("resize", resize);
-      chart.dispose();
-    };
-  }, [option]);
-
-  return <div ref={ref} className={className} />;
-}
-
 function CropDonut({ fields, totalArea }: { fields: CommandField[]; totalArea: number }) {
-  const data = fields.map((field) => ({
-    name: CROP_LABELS[field.cropType] ?? field.cropType,
-    value: field.areaMu,
-    itemStyle: { color: COMMAND_CROP_COLORS[field.cropType] ?? "#7ee787" }
-  }));
+  const option = useMemo<EChartsOption>(() => {
+    const data = fields.map((field) => ({
+      name: CROP_LABELS[field.cropType] ?? field.cropType,
+      value: field.areaMu,
+      itemStyle: { color: COMMAND_CROP_COLORS[field.cropType] ?? "#7ee787" }
+    }));
 
-  const option = useMemo<echarts.EChartsOption>(() => ({
-    animationDuration: 1200,
-    series: [
-      {
-        type: "pie",
-        radius: ["54%", "82%"],
-        center: ["50%", "50%"],
-        avoidLabelOverlap: true,
-        label: { show: false },
-        labelLine: { show: false },
-        itemStyle: { borderColor: "#06232b", borderWidth: 2 },
-        data
-      }
-    ]
-  }), [data]);
+    return {
+      animationDuration: 1200,
+      series: [
+        {
+          type: "pie",
+          radius: ["54%", "82%"],
+          center: ["50%", "50%"],
+          avoidLabelOverlap: true,
+          label: { show: false },
+          labelLine: { show: false },
+          itemStyle: { borderColor: "#06232b", borderWidth: 2 },
+          data
+        }
+      ]
+    };
+  }, [fields]);
 
   return (
     <div className="sci-donut-wrap">
@@ -448,7 +377,7 @@ function RiskAlerts({ fields }: { fields: CommandField[] }) {
 
 function SoilChart({ fields }: { fields: CommandField[] }) {
   const days = ["05-14", "05-15", "05-16", "05-17", "05-18", "05-19", "05-20"];
-  const option = useMemo<echarts.EChartsOption>(() => ({
+  const option = useMemo<EChartsOption>(() => ({
     animationDuration: 1300,
     grid: { left: 34, right: 12, top: 28, bottom: 42 },
     tooltip: { trigger: "axis", backgroundColor: "rgba(3,17,21,.96)", borderColor: "#2fb8c2", textStyle: { color: "#d8f3e8" } },

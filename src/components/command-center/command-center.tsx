@@ -127,11 +127,17 @@ export function CommandCenter({ data }: { data: CommandCenterData }) {
   const totalArea = fields.reduce((sum, field) => sum + field.areaMu, 0);
   const highRisk = fields.filter((field) => riskValue(field.riskLevel) === "high").length || 1;
   const pendingTasks = data.tasks.filter((task) => task.status === "pending").length || 4;
+  const dataSourceText =
+    data.source.mode === "real"
+      ? "实时业务数据"
+      : data.source.mode === "mixed"
+        ? "真实数据 + 演示补齐"
+        : "演示数据";
 
   return (
     <main className="sci-screen">
       <div className="sci-board">
-        <TopBar initialNow={data.generatedAt} formattedTime={data.formattedTime} />
+        <TopBar initialNow={data.generatedAt} formattedTime={data.formattedTime} dataSourceText={dataSourceText} />
 
         <section className="sci-panel sci-situation">
           <PanelTitle icon={<Tractor size={18} />} title="综合态势" />
@@ -187,7 +193,15 @@ export function CommandCenter({ data }: { data: CommandCenterData }) {
   );
 }
 
-function TopBar({ initialNow, formattedTime }: { initialNow: string; formattedTime: string }) {
+function TopBar({
+  initialNow,
+  formattedTime,
+  dataSourceText
+}: {
+  initialNow: string;
+  formattedTime: string;
+  dataSourceText: string;
+}) {
   const [timeText, setTimeText] = useState(formattedTime);
 
   useEffect(() => {
@@ -219,6 +233,7 @@ function TopBar({ initialNow, formattedTime }: { initialNow: string; formattedTi
       <div className="sci-top-right sci-ambient-strip">
         <span>{timeText}</span>
         <span className="sci-online"><CheckCircle2 size={16} /> 系统正常</span>
+        <span className="sci-data-source">{dataSourceText}</span>
         <Menu size={18} />
       </div>
     </header>

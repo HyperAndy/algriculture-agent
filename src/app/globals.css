@@ -4308,6 +4308,12 @@ textarea {
   white-space: nowrap;
 }
 
+.sci-data-source {
+  color: #f5c84c;
+  font-size: clamp(10px, 0.7vw, 12px);
+  white-space: nowrap;
+}
+
 @keyframes radarRotate {
   to {
     transform: rotate(360deg);

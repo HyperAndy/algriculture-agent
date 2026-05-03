@@ -28,28 +28,20 @@ import {
   Zap
 } from "lucide-react";
 import { clsx } from "clsx";
-import type { CommandAgentStep, CommandCenterData, CommandField, CommandTask, DemoRiskLevel } from "./types";
-
-const CROP_LABELS: Record<string, string> = {
-  rice: "水稻",
-  wheat: "小麦",
-  corn: "玉米",
-  soybean: "大豆"
-};
-
-const CROP_COLORS: Record<string, string> = {
-  rice: "#42c7ff",
-  wheat: "#f4c648",
-  corn: "#9adb60",
-  soybean: "#44c876"
-};
-
-const FALLBACK_FIELDS: CommandField[] = [
-  { id: "field_rice_001", name: "江淮水稻示范田", location: "安徽省江淮示范区", areaMu: 210, cropType: "rice", variety: "优质稻", growthStage: "分蘖期", riskLevel: "low" },
-  { id: "field_wheat_001", name: "黄淮麦田示范区", location: "河南省黄淮示范区", areaMu: 180, cropType: "wheat", variety: "强筋小麦", growthStage: "灌浆期", riskLevel: "medium" },
-  { id: "field_corn_001", name: "东北玉米示范田", location: "吉林省黑土示范区", areaMu: 200, cropType: "corn", variety: "耐密玉米", growthStage: "拔节期", riskLevel: "high" },
-  { id: "field_soybean_001", name: "黑土地大豆示范田", location: "黑龙江省示范区", areaMu: 120, cropType: "soybean", variety: "高蛋白大豆", growthStage: "开花期", riskLevel: "low" }
-];
+import { COMMAND_CROP_COLORS } from "@/design-system/big-screen/theme";
+import { CROP_LABELS } from "@/domain/crops/crop-labels";
+import type { CommandAgentStep, CommandCenterData, CommandField, CommandTask } from "./types";
+import {
+  cleanText,
+  dataSourceLabel,
+  formatCommandDate,
+  isMojibake,
+  normalizeCommandFields,
+  parseRecommendations,
+  priorityLabel,
+  riskLabel,
+  riskValue,
+} from "./model";
 
 const MAP_ZONES = [
   { crop: "wheat", risk: "medium", label: "小麦", points: "178,180 372,136 430,252 216,284", labelX: 282, labelY: 226, iconX: 278, iconY: 208 },
@@ -63,76 +55,13 @@ const SENSOR_POINTS = [
   [242, 164], [514, 204], [314, 386], [614, 404], [124, 374], [692, 294], [718, 214], [620, 122], [356, 304], [196, 250]
 ];
 
-function riskValue(level: DemoRiskLevel): "low" | "medium" | "high" {
-  return level === "high" || level === "medium" || level === "low" ? level : "low";
-}
-
-function isMojibake(value: string | null | undefined) {
-  if (!value) return false;
-  return /[锟�]|[鐜灏姘楂浣涓绋閫姣娑撻崷]/.test(value);
-}
-
-function normalizeFields(fields: CommandField[]) {
-  const source = fields.length ? fields : FALLBACK_FIELDS;
-  return FALLBACK_FIELDS.map((fallback, index) => {
-    const field = source.find((item) => item.cropType === fallback.cropType) ?? source[index] ?? fallback;
-    return {
-      ...field,
-      id: field.id || fallback.id,
-      name: isMojibake(field.name) ? fallback.name : field.name,
-      location: isMojibake(field.location) ? fallback.location : field.location,
-      growthStage: isMojibake(field.growthStage) ? fallback.growthStage : field.growthStage,
-      areaMu: field.areaMu || fallback.areaMu,
-      cropType: CROP_LABELS[field.cropType] ? field.cropType : fallback.cropType,
-      riskLevel: riskValue(field.riskLevel)
-    };
-  });
-}
-
-function formatDate(value: string) {
-  const d = new Date(value);
-  const mo = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  const h = String(d.getHours()).padStart(2, "0");
-  const mi = String(d.getMinutes()).padStart(2, "0");
-  return `${mo}-${day} ${h}:${mi}`;
-}
-
-function priorityLabel(priority: string) {
-  if (priority === "high") return "高";
-  if (priority === "medium") return "中";
-  return "低";
-}
-
-function riskLabel(level: DemoRiskLevel) {
-  const risk = riskValue(level);
-  if (risk === "high") return "高风险";
-  if (risk === "medium") return "中风险";
-  return "低风险";
-}
-
-function parseRecommendations(value?: string) {
-  if (!value || isMojibake(value)) return [];
-  try {
-    const parsed = JSON.parse(value);
-    return Array.isArray(parsed) ? parsed.map(String) : [String(parsed)];
-  } catch {
-    return value.split(/\n|;|；/).map((item) => item.trim()).filter(Boolean);
-  }
-}
-
 export function CommandCenter({ data }: { data: CommandCenterData }) {
-  const fields = useMemo(() => normalizeFields(data.fields), [data.fields]);
+  const fields = useMemo(() => normalizeCommandFields(data.fields), [data.fields]);
   const recommendations = parseRecommendations(data.latestRun?.recommendations);
   const totalArea = fields.reduce((sum, field) => sum + field.areaMu, 0);
   const highRisk = fields.filter((field) => riskValue(field.riskLevel) === "high").length || 1;
   const pendingTasks = data.tasks.filter((task) => task.status === "pending").length || 4;
-  const dataSourceText =
-    data.source.mode === "real"
-      ? "实时业务数据"
-      : data.source.mode === "mixed"
-        ? "真实数据 + 演示补齐"
-        : "演示数据";
+  const dataSourceText = dataSourceLabel(data.source.mode);
 
   return (
     <main className="sci-screen">
@@ -293,7 +222,7 @@ function CropDonut({ fields, totalArea }: { fields: CommandField[]; totalArea: n
   const data = fields.map((field) => ({
     name: CROP_LABELS[field.cropType] ?? field.cropType,
     value: field.areaMu,
-    itemStyle: { color: CROP_COLORS[field.cropType] ?? "#7ee787" }
+    itemStyle: { color: COMMAND_CROP_COLORS[field.cropType] ?? "#7ee787" }
   }));
 
   const option = useMemo<echarts.EChartsOption>(() => ({
@@ -323,7 +252,7 @@ function CropDonut({ fields, totalArea }: { fields: CommandField[]; totalArea: n
           const percent = totalArea ? ((field.areaMu / totalArea) * 100).toFixed(1) : "0.0";
           return (
             <div key={field.id}>
-              <i style={{ background: CROP_COLORS[field.cropType] }} />
+              <i style={{ background: COMMAND_CROP_COLORS[field.cropType] }} />
               <span>{CROP_LABELS[field.cropType]}</span>
               <b>{Math.round(field.areaMu)}</b>
               <em>({percent}%)</em>
@@ -532,7 +461,7 @@ function SoilChart({ fields }: { fields: CommandField[] }) {
       symbol: "circle",
       symbolSize: 5,
       lineStyle: { width: 2.5 },
-      itemStyle: { color: CROP_COLORS[field.cropType] },
+      itemStyle: { color: COMMAND_CROP_COLORS[field.cropType] },
       data: days.map((_, day) => Math.round(72 - index * 7 + Math.sin(day + index) * 7 - day * (index === 2 ? 2.8 : 0.7)))
     })),
     legend: { bottom: 0, left: 30, textStyle: { color: "#b8d7ce", fontSize: 11 }, itemWidth: 18, itemHeight: 4 }
@@ -562,7 +491,7 @@ function TaskTable({ tasks, generatedAt }: { tasks: CommandTask[]; generatedAt: 
           <span className="task-kind" title={cleanText(task.title, ["灌溉", "追肥", "病虫防治", "除草"][index] ?? "农事")}>{taskIcon(index)}{cleanText(task.title, ["灌溉", "追肥", "病虫防治", "除草"][index] ?? "农事")}</span>
           <span title={cleanText(task.description, ["3号地块玉米灌溉建议", "1号地块小麦追肥建议", "2号地块稻飞虱防治", "4号地块大豆除草建议"][index] ?? "稳产处置建议")}>{cleanText(task.description, ["3号地块玉米灌溉建议", "1号地块小麦追肥建议", "2号地块稻飞虱防治", "4号地块大豆除草建议"][index] ?? "稳产处置建议")}</span>
           <span title={cleanText(task.fieldName, `${index + 1}号地块`)}>{cleanText(task.fieldName, `${index + 1}号地块`)}</span>
-          <span>{formatDate(task.dueDate)}</span>
+          <span>{formatCommandDate(task.dueDate)}</span>
           <span className={`prio ${task.priority}`}>{priorityLabel(task.priority)}</span>
           <span className="task-state">待执行</span>
           <ChevronRight size={14} />
@@ -593,15 +522,11 @@ function AnalysisList({ latestSummary, createdAt, fieldName, recommendations }: 
         <article className={`analysis-${index}`} key={`${item}-${index}`}>
           <RadioTower size={15} />
           <p title={item}>{item}</p>
-          <time>{createdAt ? formatDate(createdAt) : `05-20 0${index + 8}:50`}</time>
+          <time>{createdAt ? formatCommandDate(createdAt) : `05-20 0${index + 8}:50`}</time>
         </article>
       ))}
     </div>
   );
-}
-
-function cleanText(value: string, fallback: string) {
-  return isMojibake(value) ? fallback : value;
 }
 
 function fallbackTasks(dueDate: string): CommandTask[] {

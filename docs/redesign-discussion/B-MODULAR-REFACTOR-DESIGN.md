@@ -336,12 +336,27 @@ Next Web
 
 ## 10. 实施阶段
 
+当前实施状态：
+
+- Phase 1 已完成：`/demo` 已改为通过 dashboard ViewModel service 读取真实后台数据，并在缺失时 fallback 到演示数据。
+- Phase 2 已完成：`command-center.tsx` 已拆成大屏组合壳和独立面板组件，保留原有视觉 class、动效和数据契约。
+- 当前分支：`modular-refactor-design`。
+- 当前未进入 Phase 3/4：后台 SaaS 化和移动端完整操作仍是后续阶段。
+
 ### Phase 1：结构与边界
 
 - 建立 `features/*`、`domain/*`、`application/*`、`infrastructure/*`、`design-system/*`。
 - 抽出 dashboard ViewModel。
 - 抽出 demo fallback 数据。
 - 大屏组件改为只消费 ViewModel。
+- 已落地文件包括：
+  - `src/features/dashboard/types.ts`
+  - `src/features/dashboard/server/get-command-dashboard-view-model.ts`
+  - `src/features/dashboard/server/build-command-dashboard-view-model.ts`
+  - `src/features/dashboard/server/format-command-time.ts`
+  - `src/infrastructure/demo-data/command-dashboard-demo.ts`
+  - `src/domain/risk/risk-level.ts`
+  - `src/domain/crops/crop-labels.ts`
 
 ### Phase 2：大屏重整
 
@@ -349,6 +364,14 @@ Next Web
 - 建立 `design-system/big-screen`。
 - 保留真实数据 + fallback。
 - 补齐大屏模块级测试和视觉验收清单。
+- 已落地拆分：
+  - `src/components/command-center/command-center.tsx` 现在只负责页面组合。
+  - `src/components/command-center/model.ts` 承载大屏纯 helper。
+  - `src/components/command-center/top-bar.tsx`、`panel-title.tsx`、`echart.tsx` 承载共享渲染原语。
+  - `situation-metrics-panel.tsx`、`crop-distribution-panel.tsx`、`growth-stage-panel.tsx` 承载左侧面板。
+  - `field-risk-map.tsx`、`map-layout.ts` 承载中央地图和地图静态布局。
+  - `agent-decision-chain.tsx`、`risk-warning-panel.tsx`、`soil-moisture-trend.tsx`、`command-task-queue.tsx`、`recent-analysis-panel.tsx` 承载右侧和底部业务面板。
+  - `src/design-system/big-screen/theme.ts` 承载大屏主题常量。
 
 ### Phase 3：后台 SaaS 化
 

@@ -9,6 +9,8 @@ import { EmptyState } from "@/components/console/empty-state"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card"
 
+export const dynamic = "force-dynamic"
+
 const CROP_CONFIG: Record<string, { label: string; color: string }> = {
   rice: { label: "水稻", color: "#3b82f6" },
   wheat: { label: "小麦", color: "#f59e0b" },

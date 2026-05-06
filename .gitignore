@@ -5,3 +5,5 @@ prisma/dev.db
 .env.local
 .env
 docs/
+
+.vercel

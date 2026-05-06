@@ -180,4 +180,26 @@ describe("getCommandDashboardViewModel", () => {
       },
     });
   });
+
+  it("falls back to demo input when Prisma is unavailable", async () => {
+    const now = new Date("2026-05-03T01:02:03.000Z");
+    const expectedViewModel = { generatedAt: now.toISOString(), source: { mode: "demo" } };
+
+    mocks.fieldFindMany.mockRejectedValue(new Error("database unavailable"));
+    mocks.farmingTaskFindMany.mockResolvedValue([]);
+    mocks.agentRunFindFirst.mockResolvedValue(null);
+    mocks.buildCommandDashboardViewModel.mockReturnValue(expectedViewModel);
+
+    const { getCommandDashboardViewModel } = await import(
+      "@/features/dashboard/server/get-command-dashboard-view-model"
+    );
+
+    await expect(getCommandDashboardViewModel(now)).resolves.toBe(expectedViewModel);
+    expect(mocks.buildCommandDashboardViewModel).toHaveBeenCalledWith({
+      now,
+      fields: [],
+      tasks: [],
+      latestRun: null,
+    });
+  });
 });

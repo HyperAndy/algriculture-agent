@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/db"
 import { TasksClient } from "./tasks-client"
 
+export const dynamic = "force-dynamic"
+
 export default async function TasksPage() {
   const tasks = await prisma.farmingTask.findMany({
     include: {
